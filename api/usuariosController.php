@@ -32,7 +32,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
         break;
     case 'POST':
         {
-            
+            //ejemplo json {"correo":"yo@hotmail.com","contrasena":"123"}
             $data = json_decode(file_get_contents('php://input'), true);
 
             if(isset($_SERVER['HTTP_ACTION']) && $_SERVER['HTTP_ACTION'] == 'Login'){
@@ -49,27 +49,25 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
                  if ($resultadoFuncion[0]){
                     http_response_code(200);
-                    echo json_encode(array("message" => "login exitoso", "error" => $resultadoFuncion[1]));
-                    exit;
+                    echo json_encode(array("status" => "success", "message" => $resultadoFuncion[1]));
                    }else{
                     http_response_code(400);
-                    echo json_encode(array("message" => "ocurrio un error", "error" => $resultadoFuncion[1]));
-                    exit;
-                    }
+                    echo json_encode(array("status" => "error", "message" => $resultadoFuncion[1]));
+                    }exit;
              
             }else{
                 //ejemplo json {"correo": "gato@animal.com","contrasena": "123","nombre": "CAT","rol":"vendedor","direccion":"calle 123"}
                 
                 extract($data);
 
-                if(empty($correo) || empty($contrasena) || empty($nombre) || empty($rol) ){
+                if(empty($correo) || empty($contrasena) || empty($nombre) || empty($rol) || empty($genero) || empty($fecha_nac)){
                     echo json_encode(array("message" => "algun dato vacio", "error" => "empty"));
                     exit;
                 }
                 
                 //echo $rol;
 
-                $resultadoFuncion = UsuarioClass::registrarUsuario($correo, $contrasena, $nombre, $rol);
+                $resultadoFuncion = UsuarioClass::registrarUsuario($correo, $contrasena, $nombre, $rol, $genero, $fecha_nac);
 
                if ($resultadoFuncion[0]){
                 http_response_code(200);

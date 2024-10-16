@@ -79,8 +79,8 @@
     const data = {
         rol: formData.get('role'),
         nombre: formData.get('fullname'),
-        //gender: formData.get('gender'),
-        //birthdate: formData.get('birthdate'),
+        genero: formData.get('gender'),
+        fecha_nac: formData.get('birthdate'),
         correo: formData.get('email'),
         contrasena: formData.get('password')
     };

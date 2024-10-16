@@ -1,7 +1,6 @@
 <?php
 include_once '../config/bd_conexion.php';
 
-
 class UsuarioClass{
 
     public static $conexion;
@@ -21,14 +20,13 @@ class UsuarioClass{
         
     
         if(!$usuario) {
-            echo "error en correo";
+            //echo "error en correo";
            return false;
         }  
     
         if($contrasena == $usuario["contrasena"]){
             
             $_SESSION['usuario_id']=$usuario["id"];
-            
             $_SESSION['usuario_tipo']=$usuario["rol"];
             $_SESSION['usuario_nombre']=$usuario["nombre"];
             /*echo'<script type="text/javascript">
@@ -44,27 +42,29 @@ class UsuarioClass{
             
         }else{
             
-            echo "Error en la contraseña o correo";
+            //echo "Error en la contraseña o correo";
             //print_r($usuarios["CONTRASENA"] . "serve");
             //print_r($contrasena . "input");
-            return;
+            return array(false, "error en la contrasena o correo");
         }
     
         //echo "todo bien";
-        return true;
+        return array(true, "login correcto");
     }
 
-    static function registrarUsuario($correo, $contrasena, $nombre, $rol){
+    static function registrarUsuario($correo, $contrasena, $nombre, $rol, $genero, $fecha_nac){
         self::inicializarConexion();
         //echo $rol;
         try{
-        $sqlInsert="insert into usuarios (correo, contrasena, nombre, rol) values (:correo, :contrasena, :nombre, :rol);";
+        $sqlInsert="insert into usuarios (correo, contrasena, nombre, rol, genero, fecha_nacimiento) values (:correo, :contrasena, :nombre, :rol, :genero, :fecha_nac);";
         $consultaInsert= self::$conexion->prepare($sqlInsert);
         $consultaInsert->execute(array(
         ':correo'=> $correo,
         ':contrasena'=>$contrasena,
         ':nombre'=>$nombre,
-        ':rol'=>$rol
+        ':rol'=>$rol,
+        ':genero'=>$genero,
+        ':fecha_nac'=>$fecha_nac
         ));
     
        
