@@ -1,0 +1,22 @@
+body {
+    background-color: #f9f9f9;
+}
+.navbar {
+    background-color: #007bff;
+}
+.navbar a {
+    color: white !important;
+}
+.course-header {
+    background-color: #28a745;
+    color: white;
+    padding: 20px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+.btn-like, .btn-dislike {
+    margin-right: 10px;
+}
+.comment-section {
+    margin-top: 40px;
+}

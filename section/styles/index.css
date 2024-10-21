@@ -1,0 +1,269 @@
+/* index.css */
+
+/* Colores personalizados */
+:root {
+    --teal-color: #4db6ac;
+    --coral-color: #ff6f61;
+    --cream-color: #fff3e0;
+    --text-color: #333;
+}
+
+body {
+    background-color: var(--cream-color);
+    color: var(--text-color);
+    font-family: Arial, sans-serif;
+}
+
+/* Estilos de la barra de navegación */
+.navbar {
+    background-color: var(--nav-bg-color);
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease;
+}
+
+.navbar .navbar-brand {
+    color: var(--teal-color);
+    font-weight: bold;
+}
+
+.navbar .navbar-brand:hover {
+    color: var(--coral-color);
+}
+
+.navbar .nav-link {
+    color: var(--nav-text-color);
+    margin-right: 15px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.navbar .nav-link:hover {
+    color: var(--coral-color);
+    background-color: var(--nav-hover-color);
+    border-radius: 5px;
+}
+
+.navbar-toggler {
+    border: none;
+}
+
+.navbar-toggler-icon {
+    background-image: url('https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.8.1/icons/list.svg');
+}
+
+.navbar-brand img {
+    margin-right: 10px;
+}
+
+/* Responsive Navigation */
+@media (max-width: 991px) {
+    .navbar-nav {
+        text-align: center;
+        margin-top: 10px;
+    }
+    .navbar .nav-link {
+        margin-right: 0;
+        margin-bottom: 5px;
+    }
+}
+
+/* Estilo para la barra de búsqueda */
+.search-bar {
+    margin-top: 20px;
+}
+
+/* Estilos para las tarjetas de curso */
+.course-card {
+    margin-bottom: 20px;
+    background-color: white;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+.course-card img {
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+}
+
+.btn-green {
+    background-color: var(--teal-color);
+    color: white;
+    border: none;
+}
+
+.btn-green:hover {
+    background-color: #2e7b73;
+    color: white;
+}
+
+/* Estilos para la lista de categorías */
+.category-list {
+    position: fixed;
+    top: 80px;
+    width: 200px;
+    background-color: white;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.list-unstyled a {
+    color: var(--teal-color);
+}
+
+.list-unstyled a:hover {
+    text-decoration: underline;
+}
+
+/* Estilo para formularios y botones */
+.form-container {
+    max-width: 600px;
+    margin: auto;
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.btn-custom {
+    background-color: var(--coral-color);
+    color: white;
+    border: none;
+}
+
+.btn-custom:hover {
+    background-color: #e53935;
+}
+.btn-login{
+    background-color: var(--coral-color);
+    color: white;
+    border: none;
+}
+.btn-login:hover {
+    background-color: #4db6ac;
+    color: white;
+}
+
+/* Estilo para tablas */
+.table {
+    background-color: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.table thead {
+    background-color: var(--teal-color);
+    color: white;
+}
+
+.table th, .table td {
+    padding: 15px;
+    text-align: left;
+}
+
+/* Hacer el video más grande */
+.video-container {
+    max-width: 100%;
+    margin: auto;
+}
+
+.video-container video {
+    width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Otros estilos */
+.card-body h5 {
+    color: var(--teal-color);
+}
+.return {
+    background-color: #cccccc;
+    color: rgb(125, 125, 125);
+    padding: 10px;
+    border-radius: 50px;
+    border: none;
+    margin: 20px;
+    display: block;
+    justify-content: center;
+    transition: background-color 0.3s ease, color 0.3s ease; /* Añadir transición */
+}
+
+.return:hover {
+    background-color: #2e7b73;
+    color: rgb(255, 255, 255);
+}
+
+/*Menú*/
+/* Submenús */
+.navbar .dropdown-menu {
+    background-color: var(--cream-color);
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: opacity 0.3s ease;
+}
+
+.navbar .dropdown-item {
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.navbar .dropdown-item:hover {
+    background-color: var(--nav-hover-color);
+    color: var(--coral-color);
+}
+
+/* Asegurar que los submenús estén alineados */
+.dropdown-menu {
+    margin-top: 0;
+}
+
+/*footer*/
+/* Footer */
+.footer {
+    background-color: var(--teal-color);
+    color: white;
+    padding: 20px 0;
+    margin-top: 50px;
+}
+
+.footer h5 {
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.footer a {
+    color: white;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.footer a:hover {
+    color: var(--coral-color);
+}
+
+.footer p, .footer ul {
+    margin: 0;
+    padding: 0;
+}
+
+.footer ul {
+    list-style: none;
+    padding-left: 0;
+}
+
+.footer .text-center p {
+    margin-top: 20px;
+}
+
+/*mensaje error*/
+.error-message{
+    color: #e53935;
+    margin-bottom: 10px;
+    font-size: 0.9em;
+}
+
+
