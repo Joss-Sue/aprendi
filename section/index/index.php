@@ -1,3 +1,28 @@
+<?php
+include("../../config/sessionVerif.php");
+
+// Obtener el id del usuario de la sesión
+$usuario_id = $_SESSION['usuario_id'];
+
+// Hacer una solicitud a la API para obtener los datos del usuario por su ID
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, "http://localhost/aprendi/api/usuariosController.php?id=" . $usuario_id);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$response = curl_exec($ch);
+curl_close($ch);
+
+// Decodificar la respuesta de la API (asumiendo que devuelve un JSON)
+$usuarioDatos = json_decode($response, true);
+
+// Verificar si la API devolvió los datos correctamente
+if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
+    echo "Error al obtener los datos del usuario: " . $usuarioDatos['message'];
+} else {
+    $correo = $usuarioDatos['correo'];
+    $rol = $usuarioDatos['rol'];
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -97,9 +122,15 @@
 
     <!-- Contenedor del Footer -->
     <div id="footer-container"></div>
-    
-    <!-- Incluir el menú y el footer con JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Capturar los datos del usuario pasados por PHP
+        const correo = "<?php echo $correo; ?>";
+        const rol = "<?php echo $rol; ?>";
+        // Mostrar en la consola usando JavaScript
+        console.log("Usuario en sesión: " + correo);
+        console.log("Rol del usuario: " + rol);
+    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetch('../partials/menu.php')

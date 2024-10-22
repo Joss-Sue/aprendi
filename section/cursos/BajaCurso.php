@@ -1,3 +1,33 @@
+<?php
+include("../../config/sessionVerif.php");
+
+$usuario_id = $_SESSION['usuario_id'];
+
+// Hacer una solicitud a la API 
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, "http://localhost/aprendi/api/usuariosController.php?id=" . $usuario_id);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$response = curl_exec($ch);
+curl_close($ch);
+
+// Decodificar la respuesta de la API
+$usuarioDatos = json_decode($response, true);
+
+if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
+    header("Location: error.php");
+    exit(); // Detener el script si hay un error
+} else {
+    $correo = $usuarioDatos['correo'];
+    $rol = $usuarioDatos['rol'];
+}
+
+$rol_requerido = "estudiante"; // El rol que puede acceder a esta página
+
+if ($rol !== $rol_requerido) {
+    header("location:../index/index.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>

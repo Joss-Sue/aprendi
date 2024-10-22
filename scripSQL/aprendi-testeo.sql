@@ -23,6 +23,8 @@ CREATE TABLE IF NOT EXISTS Usuarios (
     intentos_fallidos INT DEFAULT 0 COMMENT 'Número de intentos fallidos de inicio de sesión'
 );
 insert into usuarios (correo, contrasena, nombre, rol) values ("hloa", "12", "nom", "I");
+INSERT INTO usuarios (correo, nombre, contrasena, rol) 
+VALUES ('admin@correo.com', 'Administrador', MD5('admin123.'), 'administrador');
 
 CREATE TABLE IF NOT EXISTS Categorias (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador único de la categoría',

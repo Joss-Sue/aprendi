@@ -1,3 +1,27 @@
+<?php
+include("../../config/sessionVerif.php");
+
+$usuario_id = $_SESSION['usuario_id'];
+
+// Hacer una solicitud a la API 
+$ch = curl_init();
+curl_setopt($ch, CURLOPT_URL, "http://localhost/aprendi/api/usuariosController.php?id=" . $usuario_id);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+$response = curl_exec($ch);
+curl_close($ch);
+
+// Decodificar la respuesta de la API
+$usuarioDatos = json_decode($response, true);
+
+if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
+    header("Location: error.php");
+    exit(); // Detener el script si hay un error
+} else {
+    $correo = $usuarioDatos['correo'];
+    $rol = $usuarioDatos['rol'];
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -60,14 +84,18 @@
                 <div class="card-body">
                     <strong>Usuario1</strong> - <small>Fecha: 2024-09-21</small>
                     <p>Excelente curso, lo recomiendo.</p>
+                    <?php if ($rol == 'administrador'): ?>
                     <button class="btn btn-danger btn-sm" onclick="deleteComment(this)">Eliminar</button>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="card mt-3">
                 <div class="card-body">
                     <strong>Usuario2</strong> - <small>Fecha: 2024-09-20</small>
                     <p>El curso fue útil, pero algo corto.</p>
+                    <?php if ($rol == 'administrador'): ?>
                     <button class="btn btn-danger btn-sm" onclick="deleteComment(this)">Eliminar</button>
+                    <?php endif; ?>
                 </div>
             </div>
             <div class="card mt-3">

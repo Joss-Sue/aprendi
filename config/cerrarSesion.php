@@ -11,7 +11,7 @@ if(session_status()==PHP_SESSION_NONE){
 }
 session_destroy();
 
-header("location:../section/login/login.php");
+header("location:../section/index/index.php");
 //header("location:testecho.php");
 exit();
 

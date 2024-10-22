@@ -1,18 +1,10 @@
-<!-- footer.html -->
+
 <footer class="footer mt-5">
     <div class="container">
         <div class="row">
             <div class="col-md-4">
                 <h5>Sobre Nosotros</h5>
                 <p>Somos una plataforma dedicada a ofrecer cursos de alta calidad para todos. Aprende nuevas habilidades y mejora tu carrera con nosotros.</p>
-            </div>
-            <div class="col-md-4">
-                <h5>Enlaces Útiles</h5>
-                <ul class="list-unstyled">
-                    <li><a href="../index/index.php">Inicio</a></li>
-                    <li><a href="../cursos/mis-cursos.php">Mis Cursos</a></li>
-                    <li><a href="../perfil/perfil.php">Mi Perfil</a></li>
-                </ul>
             </div>
             <div class="col-md-4">
                 <h5>Contacto</h5>

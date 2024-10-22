@@ -1,39 +1,81 @@
-document.querySelector('form').addEventListener('submit', function(e) {
-    e.preventDefault();
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault(); 
 
-    // Limpiar mensajes de error previos
-    document.getElementById('error-message').innerText = '';
+    limpiarMensajesError();
 
-    let username = document.getElementById('username').value.trim();
-    let password = document.getElementById('password').value.trim();
-    let errorMessage = '';
+    const correo = document.getElementById('correo').value.trim();
+    const password = document.getElementById('password').value.trim();
+
     let valid = true;
 
-    // Validar campos vacíos
-    if (!username || !password) {
-        errorMessage += 'Por favor, completa todos los campos.<br>';
+    if (correo === '') {
+        mostrarMensajeError('error-correo', 'Por favor, ingresa un correo válido.');
+        valid = false;
+    }
+    if (password === '') {
+        mostrarMensajeError('error-password', 'Por favor, ingresa una contraseña válida.');
         valid = false;
     }
 
-    // Validar que el usuario no sea solo números o símbolos
-    const usernamePattern = /^[A-Za-z]+[A-Za-z0-9]*$/;
-    if (!usernamePattern.test(username)) {
-        errorMessage += 'El nombre de usuario debe contener al menos una letra y no puede ser solo números o símbolos.<br>';
-        valid = false;
-    }
-
-    // Validar longitud mínima de la contraseña
-    if (password.length < 8) {
-        errorMessage += 'La contraseña debe tener al menos 8 caracteres.<br>';
-        valid = false;
-    }
-
-    // Mostrar mensaje de error si no es válido
     if (!valid) {
-        document.getElementById('error-message').innerHTML = errorMessage;
-    } else {
-        // Redirigir a la página principal si todo es correcto
-        alert('Inicio de sesión exitoso');
-        window.location.href = 'index.html';
+        return;
     }
+
+    const data = {
+        correo: correo,
+        contrasena: password
+    };
+    
+    fetch('http://localhost/aprendi/api/usuariosController.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json', 
+            'ACTION': 'Login' 
+        },
+        body: JSON.stringify(data) 
+    })
+    .then(response => {
+        return response.text();  
+    })
+    .then(data => {
+        try {
+            const jsonData = JSON.parse(data); 
+            if (jsonData.status === 'success') {
+                mostrarModalExito(); 
+            } else {
+                mostrarMensajeError('error-message', jsonData.message || 'Usuario o contraseña incorrectos.');
+            }
+        } catch (error) {
+            // Si hay un error mostrar un mensaje
+            mostrarMensajeError('error-message', 'La respuesta del servidor no es válida.');
+        }
+    })
+    .catch(error => {
+        mostrarMensajeError('error-message', 'Hubo un problema con el servidor.');
+    });
 });
+
+// mostrar los mensajes de error
+function mostrarMensajeError(elementId, mensaje) {
+    const errorElement = document.getElementById(elementId);
+    errorElement.innerText = mensaje;
+    errorElement.style.color = "red";
+}
+
+// limpiar todos los mensajes de error antes de una nueva validación
+function limpiarMensajesError() {
+    document.getElementById('error-correo').innerText = '';
+    document.getElementById('error-password').innerText = '';
+    document.getElementById('error-message').innerText = '';
+}
+
+// mostrar el modal de éxito y redirigir a la página principal
+function mostrarModalExito() {
+    var modal = new bootstrap.Modal(document.getElementById('modalExito'));
+    modal.show();
+
+    // Redirigir 
+    document.getElementById('cerrarModal').addEventListener('click', function() {
+        window.location.href = '../index/index.php';  // Redirigir al index
+    });
+}
