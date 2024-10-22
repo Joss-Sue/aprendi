@@ -11,7 +11,7 @@ class UsuarioClass{
 
     static function matchLogin($correo, $contrasena){
         self::inicializarConexion();
-        $sql="select * from usuarios where correo = :correo";
+        $sql="call login_usuario(:correo);";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['correo'=>$correo]);
     
@@ -56,7 +56,7 @@ class UsuarioClass{
         self::inicializarConexion();
         //echo $rol;
         try{
-        $sqlInsert="insert into usuarios (correo, contrasena, nombre, rol, genero, fecha_nacimiento) values (:correo, :contrasena, :nombre, :rol, :genero, :fecha_nac);";
+        $sqlInsert="call insertarusuario (:correo, :contrasena, :nombre, :rol, :genero, :fecha_nac);";
         $consultaInsert= self::$conexion->prepare($sqlInsert);
         $consultaInsert->execute(array(
         ':correo'=> $correo,
@@ -93,7 +93,7 @@ class UsuarioClass{
         }
 
         try{
-        $sqlUpdate="update usuarios set correo = :correo, contrasena = :contrasena, nombre= :nombre where id= :id ";
+        $sqlUpdate="call editar_usuario(:correo, :contrasena, :nombre, :id)";
         $sentencia2 = self::$conexion-> prepare($sqlUpdate);
         $sentencia2 -> execute(['correo'=>$correo,
                                 'contrasena'=>$contrasena,
@@ -116,7 +116,7 @@ class UsuarioClass{
            return array(false, "error en id");
         }
 
-        $sqlUpdate="update usuarios set estado = 0 where id = :id";
+        $sqlUpdate="call eliminar_usuario(:id);";
         $sentencia2 = self::$conexion-> prepare($sqlUpdate);
         $sentencia2 -> execute(['id'=>$id]);
 
@@ -135,7 +135,7 @@ class UsuarioClass{
     static function buscarUsuarioByID($id){
         
         self::inicializarConexion();
-        $sql="select * from usuarios where id=:id";
+        $sql="call buscar_usuario(:id);";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id'=>$id]);
     

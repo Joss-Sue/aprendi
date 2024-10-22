@@ -63,3 +63,86 @@ CREATE TABLE IF NOT EXISTS Niveles (
     
     FOREIGN KEY (curso_id) REFERENCES Cursos(id)
 );
+
+------------------------------------------------------------------------------------------------------
+-- SP gestion de usuarios
+------------------------------------------------------------------------------------------------------
+DELIMITER //
+
+CREATE PROCEDURE InsertarUsuario(
+    IN p_correo VARCHAR(100),
+    IN p_contrasena VARCHAR(100),
+    IN p_nombre VARCHAR(50),
+    IN p_rol VARCHAR(20),
+    IN p_genero VARCHAR(10),
+    IN p_fecha_nacimiento DATE
+)
+BEGIN
+    INSERT INTO usuarios (correo, contrasena, nombre, rol, genero, fecha_nacimiento)
+    VALUES (p_correo, p_contrasena, p_nombre, p_rol, p_genero, p_fecha_nacimiento);
+END //
+
+DELIMITER ;
+
+-- call insertarusuario('sp@test.com', '12', 'TESTER', 'ESTUDIANTE', 'MASCULINO', '1999-01-01');
+
+DELIMITER //
+
+CREATE PROCEDURE eliminar_usuario(IN p_id INT)
+BEGIN
+    UPDATE usuarios
+    SET estado = 0
+    WHERE id = p_id;
+END //
+
+DELIMITER ;
+
+-- call eliminar_usuario(1);
+
+DELIMITER //
+
+CREATE PROCEDURE buscar_usuario(IN p_id INT)
+BEGIN
+    SELECT * FROM usuarios WHERE id = p_id;
+END //
+
+DELIMITER ;
+
+-- CALL buscar_usuario(1);
+
+DELIMITER //
+
+CREATE PROCEDURE editar_usuario(
+   
+    IN p_correo VARCHAR(255),
+    IN p_contrasena VARCHAR(255),
+    IN p_nombre VARCHAR(100),
+	IN p_id INT
+)
+BEGIN
+    UPDATE usuarios
+    SET correo = p_correo,
+        contrasena = p_contrasena,
+        nombre = p_nombre
+    WHERE id = p_id;
+END //
+
+DELIMITER ;
+
+-- CALL editar_usuario('nuevo_correo@example.com', '12', 'Nuevo Nombre', 1);
+
+DELIMITER //
+
+CREATE PROCEDURE login_usuario(IN p_correo VARCHAR(255))
+BEGIN
+    SELECT * FROM usuarios WHERE correo = p_correo and estado = 1;
+END //
+
+DELIMITER ;
+
+-- CALL login_usuario('sarahi@test.com');  -- Cambia 'usuario@example.com' por el correo que deseas buscar
+drop procedure login_usuario;
+
+------------------------------------------------------------------------------------------------------
+-- SP gestion de usuarios
+------------------------------------------------------------------------------------------------------
