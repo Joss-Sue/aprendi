@@ -74,7 +74,7 @@
         document.getElementById('registroForm').addEventListener('submit', function(event) {
     event.preventDefault(); // Evita que el formulario se envíe de la manera convencional
 
-    // Recolectar los datos del formulario
+    // Recolectar los datos del formulario ejemplo
     const formData = new FormData(this);
     const data = {
         rol: formData.get('role'),
