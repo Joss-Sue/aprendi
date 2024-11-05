@@ -146,3 +146,121 @@ drop procedure login_usuario;
 ------------------------------------------------------------------------------------------------------
 -- SP gestion de usuarios
 ------------------------------------------------------------------------------------------------------
+
+
+------------------------------------------------------------------------------------------------------
+-- cambios 05-11-2024 Inicio
+------------------------------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS Inscripciones (
+    curso_id INT NOT NULL COMMENT 'ID del curso al que se ha inscrito el estudiante',
+    estudiante_id INT NOT NULL COMMENT 'ID del estudiante que se ha inscrito',
+    fecha_inscripcion DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en que el estudiante se inscribió',
+    fecha_ultima DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT 'Fecha y hora de la ultima vez que entro al curso',
+    fecha_terminacion DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora de la terminacion del curso',
+    progreso_curso DECIMAL(3,2) DEFAULT 0.00 COMMENT 'Progreso total del curso',
+    precio_pagado DECIMAL(10,2) COMMENT 'Precio total pagado por el curso',
+    tipo_pago VARCHAR(30) NOT NULL COMMENT 'Tipo de pago recibido por el curso',
+    
+    PRIMARY KEY (curso_id,estudiante_id),
+    FOREIGN KEY (curso_id) REFERENCES Cursos(id),
+    FOREIGN KEY (estudiante_id) REFERENCES Usuarios(id)	
+);
+
+drop table Niveles;
+CREATE TABLE IF NOT EXISTS Niveles (
+    curso_id INT NOT NULL COMMENT 'ID del curso al que pertenece este nivel',
+    nivel INT NOT NULL COMMENT 'Número de nivel dentro del curso',
+    url_video VARCHAR(255) NOT NULL COMMENT 'URL o ruta del video',
+    descripcion TEXT COMMENT 'Descripción del contenido de este nivel',
+    estado INT DEFAULT 1 COMMENT 'Estado del nivel del curso en el portal (1: Activo, 0: Dado de baja)', 
+    
+    primary key (curso_id, nivel),
+    FOREIGN KEY (curso_id) REFERENCES Cursos(id)
+);
+
+CREATE TABLE IF NOT EXISTS Certificados (
+    estudiante_id INT NOT NULL COMMENT 'ID del estudiante que recibe el certificado',
+    curso_id INT NOT NULL COMMENT 'ID del curso que ha completado el estudiante',
+    fecha_emision DATETIME DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha de emisión del certificado',
+    nombre_estudiante VARCHAR(100) COMMENT 'Nombre completo del estudiante',
+    nombre_curso VARCHAR(255) COMMENT 'Nombre del curso completado',
+    nombre_instructor VARCHAR(100) COMMENT 'Nombre del instructor que certifica el curso',
+    
+    PRIMARY KEY (estudiante_id,curso_id),
+    FOREIGN KEY (estudiante_id) REFERENCES Usuarios(id),
+    FOREIGN KEY (curso_id) REFERENCES Cursos(id)
+);
+
+DELIMITER //
+
+CREATE PROCEDURE InsertarCertificado (
+    IN p_estudiante_id INT,
+    IN p_curso_id INT
+)
+BEGIN
+    DECLARE v_nombre_estudiante VARCHAR(255);
+    DECLARE v_nombre_curso VARCHAR(255);
+    DECLARE v_nombre_instructor VARCHAR(255);
+
+    -- Obtener el nombre del estudiante
+    SELECT nombre INTO v_nombre_estudiante
+    FROM Usuarios
+    WHERE id = p_estudiante_id;
+
+    -- Obtener el título del curso
+    SELECT titulo INTO v_nombre_curso
+    FROM Cursos
+    WHERE id = p_curso_id;
+
+    -- Obtener el nombre del instructor
+    SELECT u.nombre INTO v_nombre_instructor
+    FROM Cursos c
+    JOIN Usuarios u ON c.instructor_id = u.id
+    WHERE c.id = p_curso_id;
+
+    -- Insertar el certificado
+    INSERT INTO Certificados (estudiante_id, curso_id, nombre_estudiante, nombre_curso, nombre_instructor) 
+    VALUES (p_estudiante_id, p_curso_id, v_nombre_estudiante, v_nombre_curso, v_nombre_instructor);
+END //
+
+DELIMITER ;
+
+CREATE TABLE IF NOT EXISTS estudiantes_niveles(
+	curso_id INT,
+    nivel_id INT,
+    estudiante_id INT,
+    
+    primary key(curso_id, nivel_id, estudiante_id),
+	FOREIGN KEY (estudiante_id) REFERENCES Usuarios(id),
+    FOREIGN KEY (curso_id, nivel_id) REFERENCES Niveles(curso_id, nivel)
+);
+
+CREATE VIEW vista_inscripciones AS
+SELECT 
+    i.curso_id,
+    i.estudiante_id,
+    i.fecha_inscripcion,
+    i.fecha_ultima,
+    i.fecha_terminacion,
+    i.precio_pagado,
+    i.tipo_pago,
+    COALESCE(
+        (COUNT(en.curso_id) / n.total_niveles) * 100, 
+        0
+    ) AS progreso_curso
+FROM 
+    Inscripciones i
+LEFT JOIN 
+    estudiantes_niveles en ON i.curso_id = en.curso_id AND i.estudiante_id = en.estudiante_id
+JOIN 
+    (
+        SELECT curso_id, COUNT(*) AS total_niveles
+        FROM Niveles
+        GROUP BY curso_id
+    ) n ON i.curso_id = n.curso_id
+GROUP BY 
+    i.curso_id, i.estudiante_id;
+
+------------------------------------------------------------------------------------------------------
+-- cambios 05-11-2024 Final
+------------------------------------------------------------------------------------------------------

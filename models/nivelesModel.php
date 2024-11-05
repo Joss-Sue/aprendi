@@ -52,7 +52,7 @@ class NivelClass{
                                     'id'=>$id));
             return array(true,"actualizado con exito");
         }catch(PDOException $e){
-            return array(false, "Error al editar categoria: " . $e->getMessage());
+            return array(false, "Error al editar el nivel: " . $e->getMessage());
         }
         
 
@@ -83,7 +83,7 @@ class NivelClass{
     static function buscarNivelByID($id){
         
         self::inicializarConexion();
-        $sql="select * from niveles where id=:id";
+        $sql="select * from niveles where estado =1 and id =:id";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id'=>$id]);
     
@@ -100,7 +100,7 @@ class NivelClass{
     static function buscarAllNiveles($id){
         
         self::inicializarConexion();
-        $sql="select * from niveles where estado = 1 and curso_id= :id";
+        $sql="select * from niveles where estado = 1 and curso_id = :id";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id'=>$id]);
         
