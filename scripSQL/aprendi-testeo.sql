@@ -270,3 +270,122 @@ GROUP BY
 ------------------------------------------------------------------------------------------------------
 -- cambios 05-11-2024 Final
 ------------------------------------------------------------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS Comentarios (
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador único del comentario',
+    curso_id INT NOT NULL COMMENT 'ID del curso al que se refiere el comentario',
+    usuario_id INT NOT NULL COMMENT 'ID del usuario que hizo el comentario',
+    contenido TEXT NOT NULL COMMENT 'Contenido del comentario',
+    calificacion INT COMMENT 'Calificación dada al curso (1 al 5)',
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en que se hizo el comentario',
+	estado INT DEFAULT 1 COMMENT 'Estado del usuario en el portal (1: Activo, 0: Borrado, 2:Bloqueado)',
+    
+    FOREIGN KEY (curso_id) REFERENCES Cursos(id),
+    FOREIGN KEY (usuario_id) REFERENCES Usuarios(id)
+);
+
+CREATE VIEW vista_cursos AS
+SELECT 
+    c.*, 
+    COALESCE(AVG(com.calificacion), 0) AS promedio_calificacion
+FROM 
+    cursos c
+LEFT JOIN 
+    comentarios com ON c.id = com.curso_id
+GROUP BY 
+    c.id;
+
+select * from vista_cursos;
+select * from comentarios;
+
+CREATE TABLE IF NOT EXISTS Mensajes (
+    id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador único del mensaje',	
+    remitente_id INT NOT NULL COMMENT 'ID del usuario que envía el mensaje',
+    destinatario_id INT NOT NULL COMMENT 'ID del usuario que recibe el mensaje',
+    curso_id INT NOT NULL COMMENT 'ID del curso donde se origino el mensaje',
+    contenido TEXT NOT NULL COMMENT 'Contenido del mensaje',
+    fecha TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT 'Fecha y hora en que se envió el mensaje',
+	estado INT DEFAULT 1 COMMENT 'Estado del mensaje (1: Activo, 0: Borrado)',
+    
+    FOREIGN KEY (remitente_id) REFERENCES Usuarios(id),
+    FOREIGN KEY (destinatario_id) REFERENCES Usuarios(id)
+);
+ 
+select * from mensajes where curso_id = 1 and (destinatario_id =1 or remitente_id=1) order by fecha asc;
+select * from inscripciones;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_lista_cursos_reporte(IN instructor_id_param INT)
+BEGIN
+    SELECT 
+        c.id AS curso_id,
+        c.titulo AS curso_titulo,
+        COUNT(i.estudiante_id) AS total_estudiantes,
+        COALESCE(AVG(i.progreso_curso), 0) AS promedio_progreso_curso,
+        COALESCE(AVG(i.precio_pagado), 0) AS promedio_precio_pagado
+    FROM 
+        Cursos c
+    LEFT JOIN 
+        vista_inscripciones i ON c.id = i.curso_id
+    WHERE
+        c.instructor_id = instructor_id_param   -- Filtramos por el instructor_id pasado como parámetro
+    GROUP BY 
+        c.id, c.titulo
+    ORDER BY 
+        total_estudiantes DESC;
+END //
+
+DELIMITER ;
+
+call sp_lista_cursos_reporte (2);
+
+DELIMITER //
+
+CREATE PROCEDURE sp_kardex_estudiantes(IN estudiante_id_param INT)
+BEGIN
+    SELECT 
+        c.titulo AS curso_titulo,
+        ca.nombre AS categoria_nombre,  -- Aquí incluimos el campo 'nombre' de la tabla Categorias
+        vi.progreso_curso,
+        vi.fecha_inscripcion,
+        vi.fecha_terminacion,
+        vi.fecha_ultima
+    FROM 
+        vista_inscripciones vi
+    JOIN 
+        Cursos c ON vi.curso_id = c.id
+    JOIN 
+        Categorias ca ON c.categoria_id = ca.id  -- Aquí hacemos el JOIN con Categorias para obtener 'nombre'
+    WHERE 
+        vi.estudiante_id = estudiante_id_param;
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE sp_ventas_por_curso(IN curso_id_param INT)
+BEGIN
+    SELECT 
+        u.nombre AS nombre_estudiante,
+        c.titulo AS curso_titulo,
+        vi.fecha_inscripcion,
+        vi.progreso_curso,
+        vi.precio_pagado,
+        vi.tipo_pago
+    FROM 
+        vista_inscripciones vi
+    JOIN 
+        Cursos c ON vi.curso_id = c.id
+    JOIN 
+        Usuarios u ON vi.estudiante_id = u.id
+    WHERE 
+        vi.curso_id = curso_id_param;
+END //
+
+DELIMITER ;
+
+------------------------------------------------------------------------------------------------------
+-- cambios 08-11-2024 Final
+------------------------------------------------------------------------------------------------------

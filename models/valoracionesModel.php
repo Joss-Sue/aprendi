@@ -14,7 +14,7 @@ class ValoracionesClass{
         self::inicializarConexion();
         
         try{
-            $sqlInsert="insert into comentarios_valoraciones (comentario,valoracion, idProdVal, idUsuarioVal) values (:comentario, :valoracion, :idProdVal, :idUsuarioVal)";
+            $sqlInsert="insert into comentarios (contenido, calificacion, curso_id, usuario_id) values (:comentario, :valoracion, :idProdVal, :idUsuarioVal)";
             $consultaInsert= self::$conexion->prepare($sqlInsert);
             $consultaInsert->execute([
                                     ':comentario' => $comentario,
@@ -34,16 +34,11 @@ class ValoracionesClass{
         }
     }
 
-    static function editarProducto($id ,$comentario, $valoracion){
+    static function editarProducto($id,$comentario, $valoracion){
         self::inicializarConexion();
-        $producto = ValoracionesClass::buscarProductoByID($id);
         
-    
-        if($producto==null) {
-           return array(false,"error en id");
-        }
         try{
-            $sqlUpdate="update comentarios_valoraciones set comentario = :comentario, valoracion = :valoracion where id = :id;";
+            $sqlUpdate="update comentarios set contenido = :comentario, calificacion = :valoracion where id = :id;";
             $sentencia = self::$conexion-> prepare($sqlUpdate);
             $sentencia -> execute([ ':id'=>$id,
                                     ':comentario'=>$comentario,
@@ -61,14 +56,9 @@ class ValoracionesClass{
 
     static function eliminarProducto($id){
         self::inicializarConexion();
-        $categoria = ValoracionesClass::buscarProductoByID($id);
         
-    
-        if($categoria==null) {
-           return array(false, "error en id");
-        }
         try{
-        $sqlUpdate="update comentarios_valoraciones set activo = false where id = :id";
+        $sqlUpdate="update comentarios set estado = 0 where id = :id";
         $sentencia2 = self::$conexion-> prepare($sqlUpdate);
         $sentencia2 -> execute(['id'=>$id]);
             //echo '<script>alert("You have been logged out.")</script>;'
@@ -79,12 +69,14 @@ class ValoracionesClass{
                                 
     }
 
-    static function buscarProductoByID($id){
+    static function buscarProductoByID($id_curso, $id_usuario){
         
         self::inicializarConexion();
-        $sql="select * from comentarios_valoraciones where id=:id and activo = 1";
+        $sql="select * from comentarios where curso_id=:id_curso and usuario_id = :id_usuario and estado = 1";
         $sentencia = self::$conexion-> prepare($sql);
-        $sentencia -> execute(['id'=>$id]);
+        $sentencia -> execute(['id_curso'=>$id_curso,
+                            'id_usuario'=>$id_usuario
+                            ]);
     
         $producto = $sentencia->fetch(PDO::FETCH_ASSOC);
         
@@ -98,7 +90,7 @@ class ValoracionesClass{
 
     static function buscarAllProductos($id){
         self::inicializarConexion();
-        $sql="select* from comentarios_valoraciones where  activo = 1 and idProdVal= :id order by id desc";
+        $sql="select* from comentarios where estado = 1 and curso_id= :id order by id desc";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute([':id'=> $id]);
         //$sentencia->bindValue(':pagina', $pagina, PDO::PARAM_INT);
