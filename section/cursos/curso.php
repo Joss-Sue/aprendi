@@ -21,6 +21,28 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     $rol = $usuarioDatos['rol'];
 }
 
+// Obtener el ID del curso de la URL
+$curso_id = isset($_GET['id']) ? $_GET['id'] : null;
+
+if ($curso_id) {
+    // Llamar a la API para obtener los detalles del curso
+    $url = "http://localhost/aprendi/api/cursoController.php?id=" . $curso_id;
+    $response = file_get_contents($url);
+    $curso = json_decode($response, true);
+
+    if ($curso) {
+        // Mostrar los detalles del curso
+        echo "<h1>" . htmlspecialchars($curso['titulo']) . "</h1>";
+        echo "<p>" . htmlspecialchars($curso['descripcion']) . "</p>";
+        echo "<p><strong>Costo:</strong> $" . htmlspecialchars($curso['costo_total']) . "</p>";
+        // Añadir cualquier otro detalle necesario
+    } else {
+        echo "<p>No se pudo cargar el curso.</p>";
+    }
+} else {
+    echo "<p>ID de curso no especificado.</p>";
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -31,6 +53,91 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../styles/index.css">
 </head>
+<style>
+    body {
+        margin: 0; /* Eliminar margen */
+    }
+    .course-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    .video-section {
+        position: relative;
+        padding: 20px; /* Espaciado interno */
+        height: 400px; /* Ajustar altura según sea necesario */
+        background-image: url('Imagenes/It&Software(curso).jpg'); /* Imagen de fondo */
+        background-size: cover; /* Cubrir todo el área */
+        background-position: center; /* Centrar la imagen */
+        border-radius: 8px; /* Bordes redondeados */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
+        overflow: hidden; /* Ocultar contenido que se desborda */
+    }
+    .video-container {
+        position: absolute; /* Posicionar el video de manera absoluta */
+        top: 50%; /* Centrar verticalmente */
+        left: 35%; /* Centrar horizontalmente */
+        transform: translate(-50%, -50%); /* Ajustar el centrado */
+        transition: transform 0.5s ease; /* Transición para el efecto de movimiento */
+    }
+    .video-container video {
+        width: 225%;
+        height: 225%;
+        border-radius: 8px; /* Bordes redondeados para el video */
+    }
+    .thumbnail-container {
+        display: flex;
+        justify-content: center; /* Centrar miniaturas */
+        margin-top: 10px; /* Margen superior */
+    }
+    .thumbnail {
+        width: 80px; /* Ancho de las miniaturas */
+        height: 45px; /* Altura de las miniaturas */
+        margin: 0 5px; /* Espaciado entre miniaturas */
+        cursor: pointer; /* Cambiar el cursor al pasar el mouse */
+        border: 2px solid transparent; /* Bordes transparentes por defecto */
+        border-radius: 5px; /* Bordes redondeados */
+    }
+    .thumbnail:hover {
+        border: 2px solid #007bff; /* Bordes azules al pasar el mouse */
+    }
+    .comprar-curso, .comment-section {
+        text-align: center; /* Centrar texto */
+    }
+    .btn-green {
+        background-color: #28a745; /* Color verde para los botones */
+        color: white;
+    }
+    .btn-green:hover {
+        background-color: #218838; /* Color verde oscuro al pasar el mouse */
+    }
+    .return {
+        margin: 10px 0;
+        font-size: 18px;
+    }
+    /* Estilo para estrellas */
+    .rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: center;
+        margin-top: 10px;
+        font-size: 2em;
+        color: #ffd700; /* Color dorado para las estrellas */
+    }
+    .rating input {
+        display: none;
+    }
+    .rating label {
+        cursor: pointer;
+    }
+    .rating label:hover,
+    .rating input:checked ~ label:hover,
+    .rating label:hover ~ label {
+        color: #ffc700; /* Color amarillo oscuro en hover */
+    }
+    .selected {
+        color: #ffc700; /* Color amarillo oscuro para la selección */
+    }
+</style>
 <body>
     <!-- Contenedor del Menú -->
     <div id="menu-container"></div>
@@ -194,90 +301,27 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
             document.getElementById('commentForm').reset();
         });
     </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+    // Seleccionar todos los botones "Ver Curso"
+    const viewCourseButtons = document.querySelectorAll('.view-course-btn');
+
+    viewCourseButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault(); // Evita el comportamiento del enlace
+
+            const cursoId = this.getAttribute('data-id'); // Obtiene el ID del curso
+            if (cursoId) {
+                // Redirige a curso.php con el ID del curso
+                window.location.href = `curso.php?id=${cursoId}`;
+            } else {
+                console.error('ID de curso no encontrado.');
+            }
+        });
+    });
+});
+
+    </script>
 </body>
 </html>
-<style>
-    body {
-        margin: 0; /* Eliminar margen */
-    }
-    .course-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    .video-section {
-        position: relative;
-        padding: 20px; /* Espaciado interno */
-        height: 400px; /* Ajustar altura según sea necesario */
-        background-image: url('Imagenes/It&Software(curso).jpg'); /* Imagen de fondo */
-        background-size: cover; /* Cubrir todo el área */
-        background-position: center; /* Centrar la imagen */
-        border-radius: 8px; /* Bordes redondeados */
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
-        overflow: hidden; /* Ocultar contenido que se desborda */
-    }
-    .video-container {
-        position: absolute; /* Posicionar el video de manera absoluta */
-        top: 50%; /* Centrar verticalmente */
-        left: 35%; /* Centrar horizontalmente */
-        transform: translate(-50%, -50%); /* Ajustar el centrado */
-        transition: transform 0.5s ease; /* Transición para el efecto de movimiento */
-    }
-    .video-container video {
-        width: 225%;
-        height: 225%;
-        border-radius: 8px; /* Bordes redondeados para el video */
-    }
-    .thumbnail-container {
-        display: flex;
-        justify-content: center; /* Centrar miniaturas */
-        margin-top: 10px; /* Margen superior */
-    }
-    .thumbnail {
-        width: 80px; /* Ancho de las miniaturas */
-        height: 45px; /* Altura de las miniaturas */
-        margin: 0 5px; /* Espaciado entre miniaturas */
-        cursor: pointer; /* Cambiar el cursor al pasar el mouse */
-        border: 2px solid transparent; /* Bordes transparentes por defecto */
-        border-radius: 5px; /* Bordes redondeados */
-    }
-    .thumbnail:hover {
-        border: 2px solid #007bff; /* Bordes azules al pasar el mouse */
-    }
-    .comprar-curso, .comment-section {
-        text-align: center; /* Centrar texto */
-    }
-    .btn-green {
-        background-color: #28a745; /* Color verde para los botones */
-        color: white;
-    }
-    .btn-green:hover {
-        background-color: #218838; /* Color verde oscuro al pasar el mouse */
-    }
-    .return {
-        margin: 10px 0;
-        font-size: 18px;
-    }
-    /* Estilo para estrellas */
-    .rating {
-        display: flex;
-        flex-direction: row-reverse;
-        justify-content: center;
-        margin-top: 10px;
-        font-size: 2em;
-        color: #ffd700; /* Color dorado para las estrellas */
-    }
-    .rating input {
-        display: none;
-    }
-    .rating label {
-        cursor: pointer;
-    }
-    .rating label:hover,
-    .rating input:checked ~ label:hover,
-    .rating label:hover ~ label {
-        color: #ffc700; /* Color amarillo oscuro en hover */
-    }
-    .selected {
-        color: #ffc700; /* Color amarillo oscuro para la selección */
-    }
-</style>

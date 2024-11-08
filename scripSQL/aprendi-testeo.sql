@@ -36,6 +36,12 @@ CREATE TABLE IF NOT EXISTS Categorias (
     
     FOREIGN KEY (usuario_creador_id) REFERENCES Usuarios(id)
 );
+INSERT INTO Categorias (nombre, descripcion, usuario_creador_id, fecha_creacion, estado) 
+VALUES 
+('IT & Software', 'Categoria enfoicada a la tecnología', 1, '2024-10-21 22:04:14', 1),
+('Marketing Digital', 'Categoria enfoicada en la publicidad', 1, '2024-10-21 22:04:14', 1),
+('Desing Digital', 'Categoria enfoicada en el diseño digital', 1, '2024-10-21 22:04:14', 1),
+('Craft', 'Categoria enfoicada en las manualidades', 1, '2024-10-21 22:04:14', 1);
 
 CREATE TABLE IF NOT EXISTS Cursos (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador único del curso',

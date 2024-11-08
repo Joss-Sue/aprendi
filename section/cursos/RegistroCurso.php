@@ -48,44 +48,76 @@ if ($rol !== $rol_requerido) {
 
     <!-- Formulario para registrar curso -->
     <div class="container mt-4">
-        <form action="procesar_registro_curso.php" method="POST" enctype="multipart/form-data">
+        <form id="registroCursoForm" method="POST">
+        <input type="hidden" id="usuarioId" value="<?php echo $usuario_id; ?>">
+            <!-- Selector de Curso -->
+            <div class="mb-3">
+                <label for="cursoSelect" class="form-label">Selecciona un Curso</label>
+                <select class="form-select" id="categoria" name="categoria">
+                <option value="">Seleccione una categoría</option>
+                </select>
+                <span id="error-categoria" class="error-message"></span>
+            </div>
+
             <div class="mb-3">
                 <label for="courseName" class="form-label">Nombre del Curso</label>
-                <input type="text" class="form-control" id="courseName" name="courseName" required>
+                <input type="text" class="form-control" id="titulo" name="titulo" >
+                <span class="error-message" id="error-titulo"></span>
             </div>
 
             <div class="mb-3">
                 <label for="levels" class="form-label">Cantidad de Niveles</label>
-                <input type="number" class="form-control" id="levels" name="levels" required>
+                <input type="number" class="form-control" id="cantidad_niveles" name="cantidad_niveles" >
+                <span class="error-message" id="error-cantidad_niveles"></span>
             </div>
 
             <div class="mb-3">
                 <label for="cost" class="form-label">Costo por Curso Completo</label>
-                <input type="number" class="form-control" id="cost" name="cost" required>
+                <input type="number" class="form-control" id="costo_total" name="costo_total">
+                <span class="error-message" id="error-costo_total"></span>
             </div>
 
             <div class="mb-3">
                 <label for="costPerLevel" class="form-label">Costo por Nivel</label>
-                <input type="number" class="form-control" id="costPerLevel" name="costPerLevel" required>
+                <input type="number" class="form-control" id="costo_por_nivel" name="costo_por_nivel" >
             </div>
 
             <div class="mb-3">
                 <label for="description" class="form-label">Descripción del Curso</label>
-                <textarea class="form-control" id="description" name="description" rows="4" required></textarea>
+                <textarea class="form-control" id="descripcion" name="descripcion" rows="4" ></textarea>
+                <span class="error-message" id="error-descripcion"></span>
             </div>
 
             <div class="mb-3">
                 <label for="videoUpload" class="form-label">Subir Videos del Curso</label>
-                <input class="form-control" type="file" id="videoUpload" name="videoUpload[]" multiple accept="video/*" required>
+                <input class="form-control" type="file" id="videoUpload" name="videoUpload[]" multiple accept="video/*" >
             </div>
 
             <button type="submit" class="btn btn-green">Registrar Curso</button>
         </form>
     </div>
 
+    <!-- Modal de éxito con Bootstrap -->
+    <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
+    <div class="modal-dialog">
+    <div class="modal-content">
+    <div class="modal-header">
+        <h5 class="modal-title" id="modalExitoLabel">Registro Exitoso</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    </div>
+    <div class="modal-body">
+        Curso registrado con éxito.
+    </div>
+    <div class="modal-footer">
+    <button id="cerrarModal" type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+    </div>
+    </div>
+    </div>
+    </div>
+
     <!-- Contenedor del Footer -->
     <div id="footer-container"></div>
-
+    <script src="../scriptJS/registroCurso-val.js"></script>
     <!-- Incluir el menú y el footer con JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -109,5 +141,6 @@ if ($rol !== $rol_requerido) {
             });
         });
     </script>
+   
 </body>
 </html>
