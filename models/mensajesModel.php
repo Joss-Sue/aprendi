@@ -43,7 +43,7 @@ class MensajesClass{
         $sentencia -> execute(['id'=>$id,
         'id_curso'=>$id_curso]);
     
-        $categoria = $sentencia->fetch(PDO::FETCH_ASSOC);
+        $categoria = $sentencia->fetchAll(PDO::FETCH_ASSOC);
         
     
         if(!$categoria) {

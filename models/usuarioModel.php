@@ -149,6 +149,33 @@ class UsuarioClass{
         }
     }
 
+    static function buscarTodosLosUsuarios() {
+        self::inicializarConexion();
+    
+        $sql = "SELECT * FROM Usuarios"; //WHERE estado = :estado ['estado' => 1]
+        $sentencia = self::$conexion->prepare($sql);
+        $sentencia->execute();
+    
+        $usuarios = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+    
+        if (!$usuarios) {
+            return null;
+        } else {
+            return $usuarios;
+        }
+    }
+
+    static function actualizarEstadoUsuario($id, $estado) {
+        self::inicializarConexion();
+    
+        $sql = "UPDATE Usuarios SET estado = :estado WHERE id = :id";
+        $sentencia = self::$conexion->prepare($sql);
+        $resultado = $sentencia->execute(['estado' => $estado, 'id' => $id]);
+    
+        return $resultado;
+    }
+    
+    
 }
 
 ?>

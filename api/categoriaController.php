@@ -63,13 +63,13 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
             extract($data);
             
-            if(empty($curso_id) || empty($estudiante_id) || empty($tipo)){
+            if(empty($id) || empty($nombre) || empty($descripcion) || empty($createdBy)){
                 http_response_code(400);
                 echo json_encode(array("status" => "error", "message" => "algun dato vacio"));
                 exit;
             }
 
-            $resultadoFuncion = InscripcionesClass::editarInscripcion($curso_id, $estudiante_id, $tipo);
+            $resultadoFuncion = CategoriaClass::editarCategoria($id, $nombre, $descripcion, $createdBy);
             if ($resultadoFuncion[0]){
                 http_response_code(200);
                 echo json_encode(array("status" => "success", "message" => $resultadoFuncion[1]));

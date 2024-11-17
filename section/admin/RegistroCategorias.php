@@ -28,84 +28,64 @@ if ($rol !== $rol_requerido) {
     exit();
 }
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registro de Categorías</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../styles/index.css">
+    <title>Registro de Categorías</title>
     <style>
-        /* Estilo personalizado para la lista */
-        .category-list {
-            text-align: center;
+        .container {
             margin-top: 30px;
         }
-        .category-item {
-            font-size: 1.5rem; /* Tamaño de fuente más grande */
-            margin: 10px 0;
+        .categorias-registradas {
+            max-width: 300px;
+            margin-right: 30px;
         }
-        .add-category-form {
-            margin: 20px auto;
-            text-align: center;
-        }
-        .action-buttons {
-            margin-top: 5px;
+        .formulario-categoria {
+            flex-grow: 1;
         }
     </style>
 </head>
 <body>
-    <!-- Contenedor del Menú -->
-    <div id="menu-container"></div>
+        <!-- Contenedor del Menú -->
+        <div id="menu-container"></div>
 
-    <div class="container">
-        <h2 class="text-center mt-5">Registro de Categorías</h2>
-
-        <!-- Formulario para agregar nueva categoría -->
-        <div class="add-category-form">
-            <form class="mb-4">
-                <input type="text" class="form-control" placeholder="Nueva Categoría" required>
-                <button type="submit" class="btn btn-primary mt-2">Agregar Categoría</button>
-            </form>
+    <div class="container d-flex">
+        <!-- Categorías registradas -->
+        <div class="card categorias-registradas">
+            <div class="card-body">
+                <h5 class="card-title">Categorías Registradas</h5>
+                <ul class="list-group" id="listaCategorias">
+                </ul>
+            </div>
         </div>
 
-        <!-- Lista de categorías -->
-        <div class="category-list">
-            <h3>Categorías Registradas</h3>
-            <ul class="list-unstyled">
-                <li class="category-item">
-                    IT & Software
-                    <div class="action-buttons">
-                        <button class="btn btn-warning btn-sm">Editar</button>
-                        <button class="btn btn-danger btn-sm">Borrar</button>
+        <!-- Formulario de categoría -->
+        <div class="card formulario-categoria">
+            <div class="card-body">
+                <h5 class="card-title" id="formularioTitulo">Registrar Nueva Categoría</h5>
+                <form id="formCategoria">
+                    <div class="mb-3">
+                        <label for="nombreCategoria" class="form-label">Nombre de la Categoría</label>
+                        <input type="text" class="form-control" id="nombreCategoria" placeholder="Nombre de la categoría">
                     </div>
-                </li>
-                <li class="category-item">
-                    Marketing
-                    <div class="action-buttons">
-                        <button class="btn btn-warning btn-sm">Editar</button>
-                        <button class="btn btn-danger btn-sm">Borrar</button>
+                    <div class="mb-3">
+                        <label for="descripcionCategoria" class="form-label">Descripción de la Categoría</label>
+                        <textarea class="form-control" id="descripcionCategoria" rows="3" placeholder="Descripción de la categoría"></textarea>
                     </div>
-                </li>
-                <li class="category-item">
-                    Design
-                    <div class="action-buttons">
-                        <button class="btn btn-warning btn-sm">Editar</button>
-                        <button class="btn btn-danger btn-sm">Borrar</button>
-                    </div>
-                </li>
-            </ul>
+                    <button type="button" class="btn btn-green" id="btnGuardar" onclick="guardarCategoria()">Agregar Categoría</button>
+                </form>
+            </div>
         </div>
     </div>
 
-    <!-- Contenedor del Footer -->
     <div id="footer-container"></div>
-
-    <!-- Incluir el menú y el footer con JavaScript -->
+    <script src="../scriptJS/registroCategoria-val.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+<script>
         document.addEventListener('DOMContentLoaded', function() {
             fetch('../partials/menu.php')
                 .then(response => response.text())
@@ -118,13 +98,7 @@ if ($rol !== $rol_requerido) {
                 .then(data => {
                     document.getElementById('footer-container').innerHTML = data;
                 });
-
-            // Funcionalidad para mostrar/ocultar buscador avanzado
-            document.getElementById('advancedSearchToggle').addEventListener('click', function() {
-                const advancedSearch = document.getElementById('advancedSearch');
-                advancedSearch.style.display = (advancedSearch.style.display === 'none' || advancedSearch.style.display === '') ? 'block' : 'none';
-            });
         });
-    </script>
+</script>
 </body>
 </html>

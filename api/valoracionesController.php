@@ -15,7 +15,17 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     http_response_code(200);
                     echo json_encode($productosRespuesta);
                 }exit;
-            }else{
+            }elseif (isset($_GET['ideli'])) {
+                $productosRespuesta = ValoracionesClass::buscarAllProductosEliminados($_GET['ideli']);
+                if($productosRespuesta==null){
+                    http_response_code(400);
+                    echo json_encode(array("status" => "error", "message" => "ninguna valoracion encontrada"));
+                }else{
+                    http_response_code(200);
+                    echo json_encode($productosRespuesta);
+                }exit;
+            }
+            else{
                 //http://localhost/aprendi/api/valoracionesController.php/?id=1
                 if (isset($_GET['id'])){
                     $productosRespuesta = ValoracionesClass::buscarAllProductos($_GET['id']);

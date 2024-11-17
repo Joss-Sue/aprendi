@@ -21,28 +21,6 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     $rol = $usuarioDatos['rol'];
 }
 
-// Obtener el ID del curso de la URL
-$curso_id = isset($_GET['id']) ? $_GET['id'] : null;
-
-if ($curso_id) {
-    // Llamar a la API para obtener los detalles del curso
-    $url = "http://localhost/aprendi/api/cursoController.php?id=" . $curso_id;
-    $response = file_get_contents($url);
-    $curso = json_decode($response, true);
-
-    if ($curso) {
-        // Mostrar los detalles del curso
-        echo "<h1>" . htmlspecialchars($curso['titulo']) . "</h1>";
-        echo "<p>" . htmlspecialchars($curso['descripcion']) . "</p>";
-        echo "<p><strong>Costo:</strong> $" . htmlspecialchars($curso['costo_total']) . "</p>";
-        // Añadir cualquier otro detalle necesario
-    } else {
-        echo "<p>No se pudo cargar el curso.</p>";
-    }
-} else {
-    echo "<p>ID de curso no especificado.</p>";
-}
-
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -103,17 +81,7 @@ if ($curso_id) {
     .comprar-curso, .comment-section {
         text-align: center; /* Centrar texto */
     }
-    .btn-green {
-        background-color: #28a745; /* Color verde para los botones */
-        color: white;
-    }
-    .btn-green:hover {
-        background-color: #218838; /* Color verde oscuro al pasar el mouse */
-    }
-    .return {
-        margin: 10px 0;
-        font-size: 18px;
-    }
+
     /* Estilo para estrellas */
     .rating {
         display: flex;
@@ -121,7 +89,7 @@ if ($curso_id) {
         justify-content: center;
         margin-top: 10px;
         font-size: 2em;
-        color: #ffd700; /* Color dorado para las estrellas */
+        color: #e9decf; /* Color dorado para las estrellas */
     }
     .rating input {
         display: none;
@@ -134,9 +102,85 @@ if ($curso_id) {
     .rating label:hover ~ label {
         color: #ffc700; /* Color amarillo oscuro en hover */
     }
-    .selected {
-        color: #ffc700; /* Color amarillo oscuro para la selección */
+    .rating input[type="radio"] {
+    display: none; /* Ocultar los botones de radio */
     }
+
+    .rating input[type="radio"]:checked ~ label {
+        color: #ffc700;
+    }
+
+    /*Niveles*/
+    .niveles-header {
+        display: inline-block;
+        font-size: 1.5rem;
+        padding: 10px 20px;
+        color: #ffffff;
+        background-color: #4db6ac;
+        border-radius: 25px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+
+    .niveles-header:hover {
+        background-color: #2e7b73;
+    }
+
+    .niveles-list {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        padding: 15px;
+        background-color: #f9f9f9;
+        width: 100%;
+    }
+
+    .list-group-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        margin-bottom: 10px;
+        border-radius: 5px;
+        background-color: #f8f9fa;
+    }
+
+    .niveles {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .btn-success {
+        background-color: #28a745;
+        border-color: #28a745;
+        color: white;
+        padding: 5px 10px;
+        text-decoration: none;
+        border-radius: 5px;
+    }
+
+    .btn-success:hover {
+        background-color: #218838;
+        border-color: #1e7e34;
+    }
+    .btn{
+        margin-top: 0%;
+        margin-bottom: 0%;
+    }
+        .ver-mas {
+        color: #007bff;
+        text-decoration: none;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .ver-mas:hover {
+        text-decoration: underline;
+    }
+
 </style>
 <body>
     <!-- Contenedor del Menú -->
@@ -145,11 +189,13 @@ if ($curso_id) {
     <div class="container mt-5">
         <button class="return btn btn-outline-secondary" onclick="history.back()">Regresar</button>
         
-        <div class="course-header">
-            <h1>Curso de IT & Software</h1>
-            <p>Niveles: 10 videos</p>
-            <p>Costo: $49.99</p>
-        </div>
+    <div class="course-header text-center">
+        <h1></h1>
+        <p></p>
+        <p></p>
+    </div>
+        <!-- Contenedor para los niveles -->
+        <div class="niveles mt-4"></div>
 
         <div class="video-section">
             <div id="videoContainer" class="video-container">
@@ -168,68 +214,47 @@ if ($curso_id) {
         </div>
 
         <div class="comprar-curso mt-4">
-            <h4>Comprar Curso</h4>
-            <a href="../partials/FormaPago.php" class="btn btn-green">Comprar</a>
+            <h4>Comprar Curso Completo</h4>
+            <?php if ($rol == 'estudiante'): ?>
+            <a class="btn btn-green btnCompra">Comprar</a>
+            <?php endif; ?>
         </div>
 
-        <div class="mt-4 text-center"> <!-- Centrado -->
-            <h4>Valoración del curso</h4>
-            <div class="rating" id="rating">
-                <input type="radio" name="star" id="star5" value="5"><label for="star5">★</label>
-                <input type="radio" name="star" id="star4" value="4"><label for="star4">★</label>
-                <input type="radio" name="star" id="star3" value="3"><label for="star3">★</label>
-                <input type="radio" name="star" id="star2" value="2"><label for="star2">★</label>
-                <input type="radio" name="star" id="star1" value="1"><label for="star1">★</label>
-            </div>
-            <button class="btn btn-green mt-2" onclick="submitRating()">Emitir Valoración</button>
-        </div>
-
-        <!-- Sección de Comentarios -->
+        <!-- Sección de Valoracion -->
         <div class="comment-section mt-4">
             <h4>Comentarios</h4>
-            <div class="card mt-3">
-                <div class="card-body">
-                    <strong>Usuario1</strong> - <small>Fecha: 2024-09-21</small>
-                    <p>Excelente curso, lo recomiendo.</p>
-                    <?php if ($rol == 'administrador'): ?>
-                    <button class="btn btn-danger btn-sm" onclick="deleteComment(this)">Eliminar</button>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <div class="card mt-3">
-                <div class="card-body">
-                    <strong>Usuario2</strong> - <small>Fecha: 2024-09-20</small>
-                    <p>El curso fue útil, pero algo corto.</p>
-                    <?php if ($rol == 'administrador'): ?>
-                    <button class="btn btn-danger btn-sm" onclick="deleteComment(this)">Eliminar</button>
-                    <?php endif; ?>
-                </div>
-            </div>
-            <div class="card mt-3">
-                <div class="card-body">
-                    <strong>Usuario3</strong> - <small>Fecha: 2024-07-03</small>
-                    <p><em>Comentario eliminado por administrador.</em></p>
-                </div>
-            </div>
-
+            <div  id="comentariosContainer"></div>
+        </div>
             <!-- Formulario para añadir un nuevo comentario -->
-            <div id="formulario-com" class="mt-4">
-                <h4>Deja tu comentario</h4>
-                <form id="commentForm">
-                    <div class="mb-3">
-                        <label for="commentText" class="form-label">Comentario</label>
-                        <textarea class="form-control" id="commentText" rows="3" required></textarea>
+            <div id="commentSection" class="mt-4 text-center">
+                    <div class="mt-4 text-center">
+                        <h4>Valoración del curso</h4>
+                        <div class="rating" id="rating">
+                            <input type="radio" name="star" id="star5" value="5"><label for="star5">★</label>
+                            <input type="radio" name="star" id="star4" value="4"><label for="star4">★</label>
+                            <input type="radio" name="star" id="star3" value="3"><label for="star3">★</label>
+                            <input type="radio" name="star" id="star2" value="2"><label for="star2">★</label>
+                            <input type="radio" name="star" id="star1" value="1"><label for="star1">★</label>
+                        </div>
                     </div>
-                    <button type="submit" class="btn btn-green">Enviar</button>
-                </form>
+                    <div class="mb-3">
+                        <textarea class="form-control" id="comment" rows="3"></textarea>
+                        <p class="error-comentario"></p>
+                    </div>
+                    <button type="submit" class="btn btn-green" id="submitComment">Enviar</button>
             </div>
         </div>
     </div>
 
     <!-- Contenedor del Footer -->
     <div id="footer-container"></div>
-    
-    <!-- Incluir el menú y el footer con JavaScript -->
+    <script>
+                const estudianteId = <?php echo json_encode($usuario_id); ?>;
+                const usuarioRol = <?php echo json_encode($rol); ?>; // "instructor" o "estudiante"
+    </script>
+    <script src="../scriptJS/valoracionCurso-val.js"></script>
+    <script src="../scriptJS/detallesCurso-val.js"></script>
+    <script src="../scriptJS/inscribirCurso-val.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -244,84 +269,8 @@ if ($curso_id) {
                 .then(data => {
                     document.getElementById('footer-container').innerHTML = data;
                 });
-
-            // Funcionalidad para mostrar/ocultar buscador avanzado
-            document.getElementById('advancedSearchToggle').addEventListener('click', function() {
-                const advancedSearch = document.getElementById('advancedSearch');
-                advancedSearch.style.display = (advancedSearch.style.display === 'none' || advancedSearch.style.display === '') ? 'block' : 'none';
-            });
-        });
-
-        // Cambiar el video principal
-        function changeVideo(videoSrc) {
-            const mainVideo = document.getElementById('mainVideo');
-            mainVideo.src = videoSrc;
-            mainVideo.play(); // Reproducir automáticamente el nuevo video
-        }
-
-        // Enviar valoración
-        function submitRating() {
-            const rating = document.querySelector('input[name="star"]:checked');
-            if (rating) {
-                alert('Gracias por su valoración de ' + rating.value + ' estrellas');
-            } else {
-                alert('Por favor, selecciona una valoración');
-            }
-        }
-
-        // Eliminar comentario
-        function deleteComment(button) {
-            const cardBody = button.parentNode;
-            cardBody.innerHTML = `
-                <strong>Comentario eliminado por administrador.</strong>
-            `;
-        }
-
-        document.getElementById('commentForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            const commentText = document.getElementById('commentText').value;
-
-            // Crear un nuevo comentario
-            const newComment = document.createElement('div');
-            newComment.classList.add('card', 'mt-3');
-            newComment.innerHTML = `
-                <div class="card-body">
-                    <strong>Usuario anónimo</strong> - <small>Fecha: ${new Date().toLocaleDateString()}</small>
-                    <p>${commentText}</p>
-                    <button class="btn btn-danger btn-sm" onclick="deleteComment(this)">Eliminar</button>
-                </div>
-            `;
-
-            // Insertar el comentario al principio de la sección de comentarios
-            const commentSection = document.querySelector('#formulario-com');
-            commentSection.insertBefore(newComment, commentSection.firstChild);
-
-            // Limpiar el formulario
-            document.getElementById('commentForm').reset();
         });
     </script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-    // Seleccionar todos los botones "Ver Curso"
-    const viewCourseButtons = document.querySelectorAll('.view-course-btn');
-
-    viewCourseButtons.forEach(button => {
-        button.addEventListener('click', function (event) {
-            event.preventDefault(); // Evita el comportamiento del enlace
-
-            const cursoId = this.getAttribute('data-id'); // Obtiene el ID del curso
-            if (cursoId) {
-                // Redirige a curso.php con el ID del curso
-                window.location.href = `curso.php?id=${cursoId}`;
-            } else {
-                console.error('ID de curso no encontrado.');
-            }
-        });
-    });
-});
-
-    </script>
 </body>
 </html>

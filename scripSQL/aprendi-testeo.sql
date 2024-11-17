@@ -1,12 +1,23 @@
 CREATE DATABASE IF NOT EXISTS APRENDIV1;
 USE APRENDIV1;
 
-
 --drop table niveles;--
 --select * from categorias;--
 --select * from usuarios;--
 --select * from cursos;--
 --select * from niveles;--
+
+TRUNCATE TABLE Inscripciones;
+TRUNCATE TABLE Mensajes;
+TRUNCATE TABLE estudiantes_niveles;
+TRUNCATE TABLE certificados;
+TRUNCATE TABLE comentarios;
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE Niveles;
+SET FOREIGN_KEY_CHECKS = 1;
+SET FOREIGN_KEY_CHECKS = 0;
+TRUNCATE TABLE Cursos;
+SET FOREIGN_KEY_CHECKS = 1;
 
 CREATE TABLE IF NOT EXISTS Usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador único del usuario',
@@ -171,8 +182,6 @@ CREATE TABLE IF NOT EXISTS Inscripciones (
     FOREIGN KEY (curso_id) REFERENCES Cursos(id),
     FOREIGN KEY (estudiante_id) REFERENCES Usuarios(id)	
 );
-
-drop table Niveles;
 CREATE TABLE IF NOT EXISTS Niveles (
     curso_id INT NOT NULL COMMENT 'ID del curso al que pertenece este nivel',
     nivel INT NOT NULL COMMENT 'Número de nivel dentro del curso',
@@ -240,6 +249,7 @@ CREATE TABLE IF NOT EXISTS estudiantes_niveles(
 	FOREIGN KEY (estudiante_id) REFERENCES Usuarios(id),
     FOREIGN KEY (curso_id, nivel_id) REFERENCES Niveles(curso_id, nivel)
 );
+TRUNCATE TABLE estudiantes_niveles;
 
 CREATE VIEW vista_inscripciones AS
 SELECT 

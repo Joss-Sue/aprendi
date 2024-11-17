@@ -1,29 +1,40 @@
 
 <?php
 // Incluye el archivo de verificación de sesión (asume que está en una ubicación accesible)
-include_once("../../config/sessionVerif.php");
+//include_once("../../config/sessionVerif.php");
+session_start();
+// Verificar si la sesión está activa
+if (isset($_SESSION['usuario_id'])) {
+    $usuario_id = $_SESSION['usuario_id'];
 
-// Obtener el id del usuario de la sesión
-$usuario_id = $_SESSION['usuario_id'];
+    // Hacer la solicitud para obtener los datos del usuario
+    $ch = curl_init();
+    curl_setopt($ch, CURLOPT_URL, "http://localhost/aprendi/api/usuariosController.php?id=" . $usuario_id);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+    $response = curl_exec($ch);
+    curl_close($ch);
 
-// Hacer una solicitud a la API para obtener los datos del usuario por su ID
-$ch = curl_init();
-curl_setopt($ch, CURLOPT_URL, "http://localhost/aprendi/api/usuariosController.php?id=" . $usuario_id);
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-$response = curl_exec($ch);
-curl_close($ch);
+    $usuarioDatos = json_decode($response, true);
 
-// Decodificar la respuesta de la API (asumiendo que devuelve un JSON)
-$usuarioDatos = json_decode($response, true);
-
-// Verificar si la API devolvió los datos correctamente
-if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
-    echo "Error al obtener los datos del usuario: " . $usuarioDatos['message'];
+    if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
+        echo "Error al obtener los datos del usuario: " . $usuarioDatos['message'];
+    } else {
+        $correo = $usuarioDatos['correo'];
+        $rol = $usuarioDatos['rol'];
+    }
 } else {
-    $correo = $usuarioDatos['correo'];
-    $rol = $usuarioDatos['rol'];
+    // Si no hay sesión, establecer valores predeterminados
+    $rol = null;  // Sin rol específico
 }
 ?>
+<style>
+    .navbar-nav {
+        align-items: center;
+        text-align: center;
+        display: flex;
+        justify-content: center;
+    }
+</style>
 <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
         <a class="navbar-brand" href="../index/index.php">
@@ -49,9 +60,11 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
             <?php endif; ?>
 
                 <li class="nav-item dropdown">
+                <?php if ($rol == 'estudiante'|| $rol == 'instructor'||$rol == 'administrador' ): ?>
                     <a class="nav-link dropdown-toggle" href="#" id="cursosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-book"></i>Cursos
                     </a>
+                <?php endif; ?>
                     <ul class="dropdown-menu" aria-labelledby="cursosDropdown">
                         <?php if($rol == 'instructor'): ?>
                         <li><a class="dropdown-item" href="../cursos/RegistroCurso.php">Registrar Curso</a></li>
@@ -66,9 +79,11 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
                     </ul>
                 </li>
                 <li class="nav-item dropdown">
+                <?php if ($rol == 'estudiante'|| $rol == 'instructor'||$rol == 'administrador' ): ?>
                     <a class="nav-link dropdown-toggle" href="#" id="perfilDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-person-circle"></i> Mi Perfil
                     </a>
+                    <?php endif; ?>
                     <ul class="dropdown-menu" aria-labelledby="perfilDropdown">
                         <?php if ($rol == 'estudiante'||$rol == 'instructor'||$rol == 'administrador' ): ?>
                         <li><a class="dropdown-item" href="../perfil/perfil.php">Mi Información</a></li>

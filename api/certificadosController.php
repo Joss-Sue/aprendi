@@ -6,8 +6,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         {
             //http://localhost/aprendi/api/certificadosController.php/?id_curso=1&id_estudiante=1 --obtener datos de un certificado especifico
-            if (isset($_GET['id_curso']) && isset($_GET['id_estudiante'])) {
-                $nivelRespuesta = CertificadoClass::buscarCertificadoByID($_GET['id_estudiante'],$_GET['id_curso']);
+            if (isset($_GET['curso_id']) && isset($_GET['estudiante_id'])) {
+                $nivelRespuesta = CertificadoClass::buscarCertificadoByID($_GET['estudiante_id'],$_GET['curso_id']);
                 if($nivelRespuesta==null){
                     http_response_code(400);
                     echo json_encode(array("status" => "error", "message" => "ningun certificado encontrado"));

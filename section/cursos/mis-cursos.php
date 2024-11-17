@@ -37,51 +37,68 @@ if ($rol !== $rol_requerido) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../styles/index.css">
 </head>
+<style>
+    .curso-card {
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px;
+    display: inline-block;
+    vertical-align: top;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.curso-card:hover {
+    transform: translateY(-5px);
+}
+
+.curso-card-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.curso-img {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+}
+
+.curso-info h5 {
+    font-size: 1.25rem;
+    margin: 10px 0;
+}
+
+.progreso {
+    background-color: #e0e0e0;
+    border-radius: 5px;
+    height: 10px;
+    margin: 10px 0;
+}
+
+.progreso-bar {
+    background-color: #4caf50;
+    height: 100%;
+    border-radius: 5px;
+}
+
+</style>
 <body>
     <!-- Contenedor del Menú -->
     <div id="menu-container"></div>
 
-    <div class="container mt-5">
+    <div class="container mt-5" >
         <h3 class="text-center">Mis Cursos</h3>
-        <div class="row mt-4">
-            <!-- Ejemplo de curso 1 -->
-            <div class="col-md-4">
-                <div class="card course-card">
-                    <img src="../Imagenes/It&Software(curso).jpg" class="card-img-top" alt="Curso 1">
-                    <div class="card-body">
-                        <h5 class="card-title">Curso de IT & Software</h5>
-                        <p class="card-text">Aprende desde lo básico hasta avanzado en el mundo del software.</p>
-                        <a href="../cursos/contenido-curso.php" class="btn btn-green">Empezar</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Ejemplo de curso 2 -->
-            <div class="col-md-4">
-                <div class="card course-card">
-                    <img src="../Imagenes/Marketing.jpg" class="card-img-top" alt="Curso 2">
-                    <div class="card-body">
-                        <h5 class="card-title">Curso de Marketing Digital</h5>
-                        <p class="card-text">Conviértete en un experto en marketing digital.</p>
-                        <a href="../cursos/contenido-curso.php" class="btn btn-green">Empezar</a>
-                    </div>
-                </div>
-            </div>
-            <!-- Ejemplo de curso 3 -->
-            <div class="col-md-4">
-                <div class="card course-card">
-                    <img src="../Imagenes/Design.jpg" class="card-img-top" alt="Curso 3">
-                    <div class="card-body">
-                        <h5 class="card-title">Curso de Design Digital</h5>
-                        <p class="card-text">Aprende las herramientas básicas para diseñar desde tu computadora.</p>
-                        <a href="../cursos/contenido-curso.php" class="btn btn-green">Empezar</a>
-                    </div>
-                </div>
-            </div>
+        <div class="container mt-5" id="cursosContainer">
+            <!-- Aquí se mostrarán los cursos inscritos -->
         </div>
     </div>
+
     <!-- Contenedor del Footer -->
     <div id="footer-container"></div>
-    <!-- Incluir el menú y el footer con JavaScript -->
+    <script>const usuarioId = "<?php echo $usuario_id; ?>";</script>
+    <script src="../scriptJS/misCursos-val.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -96,12 +113,6 @@ if ($rol !== $rol_requerido) {
                 .then(data => {
                     document.getElementById('footer-container').innerHTML = data;
                 });
-
-            // Funcionalidad para mostrar/ocultar buscador avanzado
-            document.getElementById('advancedSearchToggle').addEventListener('click', function() {
-                const advancedSearch = document.getElementById('advancedSearch');
-                advancedSearch.style.display = (advancedSearch.style.display === 'none' || advancedSearch.style.display === '') ? 'block' : 'none';
-            });
         });
     </script>
 </body>

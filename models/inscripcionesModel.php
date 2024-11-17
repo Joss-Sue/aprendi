@@ -35,7 +35,7 @@ class InscripcionesClass{
         }
     }
 
-    static function editarInscripcion($curso_id, $estudiante_id, $tipo){
+    static function editarInscripcion($curso_id, $estudiante_id, $tipo, $progreso){
         self::inicializarConexion();
 
         try{
@@ -47,11 +47,12 @@ class InscripcionesClass{
                 return array(false,"error en tipo");
             }
 
-            $sqlUpdate="update inscripciones set $tipo_fecha = current_timestamp where curso_id = :curso_id and estudiante_id = :estudiante_id";
+            $sqlUpdate="update inscripciones set $tipo_fecha = current_timestamp, progreso_curso = :progreso where curso_id = :curso_id and estudiante_id = :estudiante_id";
             $sentencia = self::$conexion-> prepare($sqlUpdate);
             $sentencia -> execute(array(
                                     ':curso_id'=>$curso_id,
-                                    ':estudiante_id'=>$estudiante_id
+                                    ':estudiante_id'=>$estudiante_id,
+                                    ':progreso' => $progreso
                                 ));
             return array(true,"actualizado con exito");
         }catch(PDOException $e){
@@ -87,6 +88,23 @@ class InscripcionesClass{
         $sql="select * from vista_inscripciones where estudiante_id = :id";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id'=>$id]);
+        
+    
+        $inscripcion = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+    
+        if(!$inscripcion) {
+           return null;
+        }else{
+            return $inscripcion;
+        }
+    }
+
+    static function buscarAllInscripcionesIdcurso($curso_id){
+        
+        self::inicializarConexion();
+        $sql="select * from vista_inscripciones where curso_id = :curso_id";
+        $sentencia = self::$conexion-> prepare($sql);
+        $sentencia -> execute(['curso_id'=>$curso_id]);
         
     
         $inscripcion = $sentencia->fetchAll(PDO::FETCH_ASSOC);

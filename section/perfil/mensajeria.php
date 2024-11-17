@@ -17,9 +17,9 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     header("Location: error.php");
     exit(); // Detener el script si hay un error
 } else {
-    $correo = $usuarioDatos['correo'];
-    $rol = $usuarioDatos['rol'];
 }
+$correo = $usuarioDatos['correo'];
+$rol = $usuarioDatos['rol'];
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -30,114 +30,120 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../styles/index.css">
 </head>
+<style>
+    .chat-box {
+    height: 400px;
+    overflow-y: scroll;
+    border: 2px solid #D1C6B4;
+    border-radius: 10px;
+    padding: 10px;
+}
+
+.mensaje {
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 5px;
+    max-width: 70%;
+}
+
+.mensaje-usuario {
+    color: #ffff;
+    background-color: #4db6ac; 
+    align-self: flex-end; /* Alineado a la derecha */
+}
+
+.mensaje-instructor {
+    background-color: #f1f1f1;
+    align-self: flex-start; /* Alineado a la izquierda */
+}
+
+#mensajesContainer {
+    max-height: 300px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding: 10px;
+}
+.textarea-btn{
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+}
+.btn-primary{
+    background-color: #4db6ac;
+    border: none;
+}
+.btn-primary:hover{
+    background-color: #2e7b73;
+    border: none;
+}
+.list-group{
+    gap: 10px;
+    border: none;
+    border-radius: 20px;
+}
+.list-group-item{
+    border-radius: 20px;
+    font-weight: 600;
+    color: #ffffff;
+    background-color: #4db6ac;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    transition: all 0.3s ease;
+}
+.list-group-item:hover{
+    color: #ffffff;
+    background-color: #ff6f61;
+    transform: scale(1.05); 
+}
+.list-group-item:active{
+    color: white;
+    background-color: #ff6f61;
+}
+.seleccionado {
+    background-color: #ff6f61; 
+    color: white; 
+}
+#sidebar{
+    border-radius: 10px;
+    background-color: #f2e5d0;
+    border: 2px solid #D1C6B4;
+}
+</style>
 <body>
-    <!-- Contenedor del Menú -->
     <div id="menu-container"></div>
-
     <button class="return" onclick="history.back()">Regresar</button>
-    <div class="container mt-5">
-        <h3 class="text-center">Mensajería</h3>
+    <div class="container mt-1">
+        <div class="row">
+            <!-- Panel de estudiantes/instructores según el rol -->
+            <div class="col-md-4" id="sidebar">
+                <h4 id="sidebarTitle">Usuarios</h4>
+                <div id="usuariosContainer" class="list-group"></div>
+            </div>
 
-        <!-- Selector de Curso -->
-        <div class="mb-4">
-            <label for="cursoSelect" class="form-label">Selecciona un Curso</label>
-            <select class="form-select" id="cursoSelect">
-                <option value="" selected disabled>Elige un curso</option>
-                <option value="ITSoftware">Curso de IT & Software</option>
-                <option value="Marketing101">Marketing 101</option>
-                <!-- Agrega más opciones según los cursos disponibles -->
-            </select>
-        </div>
-
-        <div class="form-container mt-4">
-            <form id="mensajeriaForm">
-                <div class="mb-3">
-                    <label for="mensaje" class="form-label">Mensaje</label>
-                    <textarea class="form-control" id="mensaje" rows="5" required></textarea>
-                </div>
-                <button type="submit" class="btn btn-custom">Enviar Mensaje</button>
-            </form>
-        </div>
-
-        <!-- Bandeja de mensajes -->
-        <div class="mt-5">
-            <h4>Bandeja de Entrada</h4>
-            <div id="bandejaMensajes">
-                <!-- Mensajes específicos del curso se mostrarán aquí -->
+            <!-- Panel de chat -->
+            <div class="col-md-8">
+                <h4>Chat</h4>
+                <div id="mensajesContainer" class="chat-box"></div>
+                <form id="mensajeriaForm" class="mt-3">
+                    <div class="textarea-btn">
+                    <textarea class="form-control" id="mensaje" rows="3" placeholder="Escribe tu mensaje..."></textarea>
+                    <button type="submit" class="btn btn-primary mt-2">Enviar</button>
+                    </div>
+                    <div id="mensajeError" style="color: red; margin-top: 5px;"></div>
+                </form>
             </div>
         </div>
     </div>
-    <!-- Contenedor del Footer -->
+
     <div id="footer-container"></div>
-    <!-- Incluir el menú y el footer con JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
+        const usuarioId = <?php echo json_encode($usuario_id); ?>;
+        const usuarioRol = <?php echo json_encode($rol); ?>; // "instructor" o "estudiante"
+
         document.addEventListener('DOMContentLoaded', function() {
-            // Evento para cambiar el curso
-            document.getElementById('cursoSelect').addEventListener('change', function() {
-                const cursoSeleccionado = this.value;
-                cargarMensajes(cursoSeleccionado);
-            });
-
-            // Función para cargar mensajes según el curso seleccionado
-            function cargarMensajes(curso) {
-                const bandejaMensajes = document.getElementById('bandejaMensajes');
-                bandejaMensajes.innerHTML = ''; // Limpiar mensajes previos
-
-                // Simulación de carga de mensajes
-                if (curso === 'ITSoftware') {
-                    const mensajes = [
-                        {usuario: 'Instructor 1', fecha: '2024-09-15 14:30', texto: 'Hola, ¿tienes alguna pregunta sobre el curso?'},
-                        {usuario: 'Instructor 2', fecha: '2024-09-14 10:00', texto: 'Te recuerdo que la siguiente clase es el lunes.'}
-                    ];
-                    mensajes.forEach(mensaje => {
-                        const nuevoMensaje = document.createElement('div');
-                        nuevoMensaje.classList.add('card', 'mt-3');
-                        nuevoMensaje.innerHTML = `
-                            <div class="card-body">
-                                <img src="ruta/a/imagen.jpg" alt="Imagen de usuario" class="img-thumbnail" width="50">
-                                <strong>${mensaje.usuario}</strong> - <small>Fecha: ${mensaje.fecha}</small>
-                                <p>${mensaje.texto}</p>
-                            </div>
-                        `;
-                        bandejaMensajes.appendChild(nuevoMensaje);
-                    });
-                } else if (curso === 'Marketing101') {
-                    // Agregar lógica para cargar mensajes del curso 'Marketing101'
-                }
-                // Agregar más condiciones para otros cursos
-            }
-
-            // Evento para enviar mensaje
-            document.getElementById('mensajeriaForm').addEventListener('submit', function(event) {
-                event.preventDefault();
-
-                const cursoSeleccionado = document.getElementById('cursoSelect').value;
-                if (!cursoSeleccionado) {
-                    alert('Por favor, selecciona un curso antes de enviar un mensaje.');
-                    return;
-                }
-
-                const mensajeText = document.getElementById('mensaje').value;
-
-                // Crear un nuevo mensaje
-                const nuevoMensaje = document.createElement('div');
-                nuevoMensaje.classList.add('card', 'mt-3');
-                nuevoMensaje.innerHTML = `
-                    <div class="card-body">
-                        <img src="ruta/a/imagen.jpg" alt="Imagen de usuario" class="img-thumbnail" width="50">
-                        <strong>Usuario</strong> - <small>Fecha: ${new Date().toLocaleDateString()} Hora: ${new Date().toLocaleTimeString()}</small>
-                        <p>${mensajeText}</p>
-                    </div>
-                `;
-
-                // Añadir el mensaje a la bandeja de mensajes
-                document.getElementById('bandejaMensajes').prepend(nuevoMensaje);
-
-                // Limpiar el formulario
-                document.getElementById('mensajeriaForm').reset();
-            });
-
+            // Cargar menú y footer
             fetch('../partials/menu.php')
                 .then(response => response.text())
                 .then(data => {
@@ -150,6 +156,11 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
                     document.getElementById('footer-container').innerHTML = data;
                 });
         });
+
     </script>
+    <script src="../scriptJS/mensajeria-val.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+
 </body>
 </html>
+

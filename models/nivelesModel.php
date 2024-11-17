@@ -18,9 +18,9 @@ class NivelClass{
         $consultaInsert= self::$conexion->prepare($sqlInsert);
         $consultaInsert->execute(array(
         ':curso_id'=>$curso_id,
-        ':descripcion'=>$descripcion,
         ':nivel'=>$nivel,
-        ':url_video'=>$url_video
+        ':url_video'=>$url_video,
+        ':descripcion'=>$descripcion
         ));
 
         return array(true,"insertado con exito");

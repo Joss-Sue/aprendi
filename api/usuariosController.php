@@ -27,6 +27,17 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     http_response_code(200);
                     echo json_encode($usuarioRespuesta);
                 }
+            } else {
+                // Si no se pasa 'id', obtener todos los usuarios.
+                $todosUsuarios = UsuarioClass::buscarTodosLosUsuarios();
+                if ($todosUsuarios == null) {
+                    http_response_code(400);
+                    echo json_encode(array("status" => "error", "message" => "no se encontraron usuarios"));
+                    exit;
+                } else {
+                    http_response_code(200);
+                    echo json_encode($todosUsuarios);
+                }
             }
         }
         break;
@@ -101,6 +112,43 @@ switch ($_SERVER['REQUEST_METHOD']) {
             }
             break;
         }
+        case 'PATCH':
+            {
+                // Leer la entrada JSON
+                $data = json_decode(file_get_contents('php://input'), true);
+                
+                // Obtener el ID del usuario de los parámetros de la URL
+                $id = (isset($_GET['id'])) ? $_GET['id'] : null;
+        
+                // Verificar que se proporcionó el ID
+                if (empty($id)) {
+                    http_response_code(400);
+                    echo json_encode(array("status" => "error", "message" => "ID de usuario requerido"));
+                    exit;
+                }
+        
+                // Verificar que se proporcionó el nuevo estado
+                $estado = isset($data['estado']) ? $data['estado'] : null;
+        
+                if (is_null($estado)) {
+                    http_response_code(400);
+                    echo json_encode(array("status" => "error", "message" => "Estado requerido para actualizar el usuario"));
+                    exit;
+                }
+        
+                // Llamar a la función de modelo para actualizar el estado del usuario
+                $resultado = UsuarioClass::actualizarEstadoUsuario($id, $estado);
+        
+                if ($resultado) {
+                    http_response_code(200);
+                    echo json_encode(array("status" => "success", "message" => "Usuario actualizado con éxito"));
+                } else {
+                    http_response_code(400);
+                    echo json_encode(array("status" => "error", "message" => "Error al actualizar el usuario"));
+                }
+                break;
+            }
+        
     case 'DELETE':
         {
             /*ejemplo json{"id":2}*/

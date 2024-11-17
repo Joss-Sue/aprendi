@@ -105,6 +105,23 @@ class ValoracionesClass{
             return $productos;
         }
     }
+    static function buscarAllProductosEliminados($id){
+        self::inicializarConexion();
+        $sql="select* from comentarios where estado = 0 and curso_id= :ideli order by id desc";
+        $sentencia = self::$conexion-> prepare($sql);
+        $sentencia -> execute([':ideli'=> $id]);
+        //$sentencia->bindValue(':pagina', $pagina, PDO::PARAM_INT);
+        $sentencia->execute();
+        
+    
+        $productos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+    
+        if(!$productos) {
+           return null;
+        }else{
+            return $productos;
+        }
+    }
 
 }
 ?>

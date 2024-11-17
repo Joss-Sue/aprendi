@@ -6,8 +6,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         {
             //http://localhost/aprendi/api/inscripcionesController.php/?id_curso=1&id_estudiante=1 --niveles por curso (ver niveles)
-            if (isset($_GET['id_curso'] ) && isset($_GET['id_estudiante'] ) ) {
-                $nivelRespuesta = InscripcionesClass::buscarInscripcionByID($_GET['id_curso'], $_GET['id_estudiante']);
+            if (isset($_GET['curso_id'] ) && isset($_GET['estudiante_id'] ) ) {
+                $nivelRespuesta = InscripcionesClass::buscarInscripcionByID($_GET['curso_id'], $_GET['estudiante_id']);
                 if($nivelRespuesta==null){
                     http_response_code(400);
                     echo json_encode(array("status" => "error", "message" => "ningun usuario encontrado"));
@@ -21,6 +21,16 @@ switch ($_SERVER['REQUEST_METHOD']) {
                     if($nivelRespuesta==null){
                         http_response_code(400);
                         echo json_encode(array("status" => "error", "message" => "ningun usuario encontrado"));
+                    }else{
+                        http_response_code(200);
+                        echo json_encode($nivelRespuesta);
+                    }exit;
+            } elseif (isset($_GET['curso_id'])){
+                //http://localhost/aprendi/api/nivelesController.php/?id=1 --nivel (editar nivel)
+                    $nivelRespuesta = InscripcionesClass::buscarAllInscripcionesIdcurso($_GET['curso_id']);
+                    if($nivelRespuesta==null){
+                        http_response_code(400);
+                        echo json_encode(array("status" => "error", "message" => "ningun curso encontrado"));
                     }else{
                         http_response_code(200);
                         echo json_encode($nivelRespuesta);
@@ -59,8 +69,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
                         echo json_encode($json_response);
                 }
                 exit;
-            }
-            
+            }    
     case 'PUT':
         {
             /*ejemplo json{"curso_id": 1, "estudiante_id": 1, "tipo": "tarjeta"}
@@ -75,7 +84,7 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 exit;
             }
 
-            $resultadoFuncion = InscripcionesClass::editarInscripcion($curso_id, $estudiante_id, $tipo);
+            $resultadoFuncion = InscripcionesClass::editarInscripcion($curso_id, $estudiante_id, $tipo, $progreso);
             if ($resultadoFuncion[0]){
                 http_response_code(200);
                 echo json_encode(array("status" => "success", "message" => $resultadoFuncion[1]));

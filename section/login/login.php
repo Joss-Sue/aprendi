@@ -26,7 +26,7 @@
             <form id="loginForm">
                 <div class="mb-3">
                     <label for="correo" class="form-label">Correo</label>
-                    <input type="email" class="form-control" id="correo" name="correo">
+                    <input type="text" class="form-control" id="correo" name="correo">
                     <span id="error-correo" class="error-message"></span> 
                 </div>
                 <div class="mb-3">

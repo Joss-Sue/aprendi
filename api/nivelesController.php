@@ -6,8 +6,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         {
             //http://localhost/aprendi/api/nivelesController.php/?id_curso=1 --niveles por curso (ver niveles)
-            if (isset($_GET['id_curso'])) {
-                $nivelRespuesta = NivelClass::buscarAllNiveles($_GET['id_curso']);
+            if (isset($_GET['curso_id'])) {
+                $nivelRespuesta = NivelClass::buscarAllNiveles($_GET['curso_id']);
                 if($nivelRespuesta==null){
                     http_response_code(400);
                     echo json_encode(array("status" => "error", "message" => "ningun usuario encontrado"));

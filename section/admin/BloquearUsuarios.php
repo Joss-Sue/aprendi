@@ -67,79 +67,22 @@ if ($rol !== $rol_requerido) {
 
         <!-- Buscador de usuarios -->
         <div class="mb-4">
-            <input type="text" class="form-control" id="searchUser" placeholder="Buscar por nombre o correo..." oninput="searchUser()">
+            <input type="text" class="form-control" id="searchUser" placeholder="Buscar por nombre o correo...">
         </div>
 
         <!-- Lista de usuarios -->
         <div class="user-list">
             <h3>Usuarios Registrados</h3>
-            <ul class="list-unstyled" id="userList">
-                <li class="user-item" id="user1">
-                    Juan Pérez (juan.perez@example.com)
-                    <button class="btn btn-danger btn-sm float-end" onclick="toggleUser('user1', 'Juan Pérez')">Bloquear</button>
-                    <button class="btn btn-success btn-sm float-end d-none" onclick="toggleUser('user1', 'Juan Pérez')">Desbloquear</button>
-                </li>
-                <li class="user-item" id="user2">
-                    María Gómez (maria.gomez@example.com)
-                    <button class="btn btn-danger btn-sm float-end" onclick="toggleUser('user2', 'María Gómez')">Bloquear</button>
-                    <button class="btn btn-success btn-sm float-end d-none" onclick="toggleUser('user2', 'María Gómez')">Desbloquear</button>
-                </li>
-                <li class="user-item" id="user3">
-                    Carlos López (carlos.lopez@example.com)
-                    <button class="btn btn-danger btn-sm float-end" onclick="toggleUser('user3', 'Carlos López')">Bloquear</button>
-                    <button class="btn btn-success btn-sm float-end d-none" onclick="toggleUser('user3', 'Carlos López')">Desbloquear</button>
-                </li>
-                <li class="user-item" id="user4">
-                    Laura Martínez (laura.martinez@example.com)
-                    <button class="btn btn-danger btn-sm float-end" onclick="toggleUser('user4', 'Laura Martínez')">Bloquear</button>
-                    <button class="btn btn-success btn-sm float-end d-none" onclick="toggleUser('user4', 'Laura Martínez')">Desbloquear</button>
-                </li>
-                <li class="user-item" id="user5">
-                    Andrés Torres (andres.torres@example.com)
-                    <button class="btn btn-danger btn-sm float-end" onclick="toggleUser('user5', 'Andrés Torres')">Bloquear</button>
-                    <button class="btn btn-success btn-sm float-end d-none" onclick="toggleUser('user5', 'Andrés Torres')">Desbloquear</button>
-                </li>
+            <ul class="list-unstyled" id="usuariosContainer">
             </ul>
         </div>
     </div>
 
     <!-- Contenedor del Footer -->
     <div id="footer-container"></div>
-
+    <script src="../scriptJS/bloquearUsuario-val.js"></script>
     <!-- Incluir el menú y el footer con JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        function toggleUser(userId, username) {
-            const userItem = document.getElementById(userId);
-            const blockButton = userItem.querySelector('.btn-danger');
-            const unblockButton = userItem.querySelector('.btn-success');
-
-            if (userItem.classList.contains('blocked')) {
-                // Desbloquear usuario
-                userItem.classList.remove('blocked');
-                alert(username + " ha sido desbloqueado.");
-                blockButton.classList.remove('d-none');
-                unblockButton.classList.add('d-none');
-            } else {
-                // Bloquear usuario
-                userItem.classList.add('blocked');
-                alert(username + " ha sido bloqueado.");
-                blockButton.classList.add('d-none');
-                unblockButton.classList.remove('d-none');
-            }
-        }
-
-        function searchUser() {
-            const input = document.getElementById('searchUser').value.toLowerCase();
-            const userItems = document.querySelectorAll('.user-item');
-
-            userItems.forEach(item => {
-                const text = item.textContent.toLowerCase();
-                item.style.display = text.includes(input) ? '' : 'none';
-            });
-        }
-    </script>
-
 <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetch('../partials/menu.php')
@@ -153,13 +96,7 @@ if ($rol !== $rol_requerido) {
                 .then(data => {
                     document.getElementById('footer-container').innerHTML = data;
                 });
-
-            // Funcionalidad para mostrar/ocultar buscador avanzado
-            document.getElementById('advancedSearchToggle').addEventListener('click', function() {
-                const advancedSearch = document.getElementById('advancedSearch');
-                advancedSearch.style.display = (advancedSearch.style.display === 'none' || advancedSearch.style.display === '') ? 'block' : 'none';
-            });
         });
-    </script>
+</script>
 </body>
 </html>

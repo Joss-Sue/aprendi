@@ -35,6 +35,7 @@ if ($rol !== $rol_requerido) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Registrar Curso</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
     <link rel="stylesheet" href="../styles/index.css">
 </head>
 <body>
@@ -92,33 +93,44 @@ if ($rol !== $rol_requerido) {
                 <label for="videoUpload" class="form-label">Subir Videos del Curso</label>
                 <input class="form-control" type="file" id="videoUpload" name="videoUpload[]" multiple accept="video/*" >
             </div>
-
+            
             <button type="submit" class="btn btn-green">Registrar Curso</button>
         </form>
+        
+        <div class="mb-3" id="nivelesForm" style="display: none;" >
+                <h3>Agregar Niveles al Curso</h3>
+                <label for="cursosSelect">Seleccionar Curso:</label>
+                <select id="cursosSelect" class="form-control"></select>
+                <br>
+                <label for="cantidad_niveles_nuevo">Niveles del curso</label>
+                <!-- <input type="number" id="cantidad_niveles_nuevo" class="form-control" min="1" placeholder="Cantidad de niveles"> -->
+                <br>
+                <div id="nivelesContainer"></div>
+                <button class="btn btn-green" onclick="registrarNiveles()">Registrar Niveles</button>
+            </div>
     </div>
 
     <!-- Modal de éxito con Bootstrap -->
     <div class="modal fade" id="modalExito" tabindex="-1" aria-labelledby="modalExitoLabel" aria-hidden="true">
-    <div class="modal-dialog">
-    <div class="modal-content">
-    <div class="modal-header">
-        <h5 class="modal-title" id="modalExitoLabel">Registro Exitoso</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-    </div>
-    <div class="modal-body">
-        Curso registrado con éxito.
-    </div>
-    <div class="modal-footer">
-    <button id="cerrarModal" type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
-    </div>
-    </div>
-    </div>
+        <div class="modal-dialog">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="modalExitoLabel">Registro Exitoso</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+            Curso registrado con éxito.
+        </div>
+        <div class="modal-footer">
+        <button id="cerrarModal" type="button" class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+        </div>
+        </div>
+        </div>
     </div>
 
     <!-- Contenedor del Footer -->
     <div id="footer-container"></div>
     <script src="../scriptJS/registroCurso-val.js"></script>
-    <!-- Incluir el menú y el footer con JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -134,11 +146,6 @@ if ($rol !== $rol_requerido) {
                     document.getElementById('footer-container').innerHTML = data;
                 });
 
-            // Funcionalidad para mostrar/ocultar buscador avanzado
-            document.getElementById('advancedSearchToggle').addEventListener('click', function() {
-                const advancedSearch = document.getElementById('advancedSearch');
-                advancedSearch.style.display = (advancedSearch.style.display === 'none' || advancedSearch.style.display === '') ? 'block' : 'none';
-            });
         });
     </script>
    
