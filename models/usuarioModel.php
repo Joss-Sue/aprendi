@@ -52,53 +52,62 @@ class UsuarioClass{
         return array(true, "login correcto");
     }
 
-    static function registrarUsuario($correo, $contrasena, $nombre, $rol, $genero, $fecha_nac){
-        self::inicializarConexion();
-        //echo $rol;
-        try{
-        $sqlInsert="call insertarusuario (:correo, :contrasena, :nombre, :rol, :genero, :fecha_nac);";
-        $consultaInsert= self::$conexion->prepare($sqlInsert);
-        $consultaInsert->execute(array(
-        ':correo'=> $correo,
-        ':contrasena'=>$contrasena,
-        ':nombre'=>$nombre,
-        ':rol'=>$rol,
-        ':genero'=>$genero,
-        ':fecha_nac'=>$fecha_nac
-        ));
-    
-       
-        //setcookie('correo',$correo,time()+3600, "/");
-        //setcookie('contrasena',$contrasena,time()+3600, "/");
-        return array(true,"insertado con exito");
+    static function registrarUsuario($correo, $contrasena, $nombre, $rol, $genero, $fecha_nac, $imagen)
+{
+    self::inicializarConexion();
+    // Decodificar la imagen Base64
+    $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
+
+    try {
+        $sqlInsert = "CALL insertarusuario (:correo, :contrasena, :nombre, :rol, :genero, :fecha_nac, :foto);";
+        $consultaInsert = self::$conexion->prepare($sqlInsert);
         
-        }catch(PDOException $e){
-            if ($e->errorInfo[1] == 1062) {
-                $cadena = "El correo electrónico ya está en uso.";
-                return array(false, $cadena);
-            } else {
-                // Otro tipo de error
-                return array(false, "Error al insertar usuario: " . $e->getMessage());
-            }
+        $consultaInsert->bindValue(':correo', $correo, PDO::PARAM_STR);
+        $consultaInsert->bindValue(':contrasena', $contrasena, PDO::PARAM_STR);
+        $consultaInsert->bindValue(':nombre', $nombre, PDO::PARAM_STR);
+        $consultaInsert->bindValue(':rol', $rol, PDO::PARAM_STR);
+        $consultaInsert->bindValue(':genero', $genero, PDO::PARAM_STR);
+        $consultaInsert->bindValue(':fecha_nac', $fecha_nac, PDO::PARAM_STR);
+
+        $consultaInsert->bindValue(':foto', $imagenBinario, PDO::PARAM_LOB);
+
+        $consultaInsert->execute();
+        
+        return array(true, "Insertado con éxito");
+
+    } catch (PDOException $e) {
+        // Manejo de errores
+        if ($e->errorInfo[1] == 1062) {
+            $cadena = "El correo electrónico ya está en uso.";
+            return array(false, $cadena);
+        } else {
+            // Otro tipo de error
+            return array(false, "Error al insertar usuario: " . $e->getMessage());
         }
     }
+}
 
-    static function editarUsuario($id, $correo, $contrasena, $nombre){
+    static function editarUsuario($id, $correo, $contrasena, $nombre, $imagen){
         self::inicializarConexion();
         $usuario = UsuarioClass::buscarUsuarioByID($id);
         
-    
         if($usuario==null) {
            return array(false,"error en id");
         }
 
+        $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
+
+
         try{
         $sqlUpdate="call editar_usuario(:correo, :contrasena, :nombre, :id)";
-        $sentencia2 = self::$conexion-> prepare($sqlUpdate);
-        $sentencia2 -> execute(['correo'=>$correo,
-                                'contrasena'=>$contrasena,
-                                'nombre'=>$nombre,
-                                'id'=>$id]);
+        $sentencia = self::$conexion-> prepare($sqlUpdate);
+
+        $sentencia->bindValue(':correo', $correo, PDO::PARAM_STR);
+        $sentencia->bindValue(':contrasena', $contrasena, PDO::PARAM_STR);
+        $sentencia->bindValue(':nombre', $nombre, PDO::PARAM_STR);
+        $sentencia->bindValue(':id', $id, PDO::PARAM_INT);
+
+        $sentencia -> execute();
 
         return array(true,"actualizado con exito");
         }catch(PDOException $e){

@@ -10,19 +10,25 @@ class CursoClass{
         self::$conexion = BD::crearInstancia();
     }
 
-    static function registrarCurso($titulo, $descripcion, $costo, $instructor, $categoria){
+    static function registrarCurso($titulo, $descripcion, $costo, $instructor, $categoria, $imagen){
         self::inicializarConexion();
         
+        $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
+
         try{
-        $sqlInsert="insert into cursos (titulo, descripcion, costo, instructor_id, categoria_id)
-        values (:titulo, :descripcion, :costo, :instructor, :categoria);";
+        $sqlInsert="insert into cursos (titulo, descripcion, costo, instructor_id, categoria_id, imagen)
+        values (:titulo, :descripcion, :costo, :instructor, :categoria, :imagen);";
         $consultaInsert= self::$conexion->prepare($sqlInsert);
-        $consultaInsert->execute([
-                                    ':titulo'=>$titulo,
-                                    ':descripcion'=>$descripcion,
-                                    ':costo'=>$costo,
-                                    ':instructor'=>$instructor,
-                                    ':categoria'=>$categoria]);
+
+        $consultaInsert->bindValue(':titulo', $titulo, PDO::PARAM_STR);
+        $consultaInsert->bindValue('descripcion', $descripcion, PDO::PARAM_STR);
+        $consultaInsert->bindValue('costo', $costo, PDO::PARAM_STR);
+        $consultaInsert->bindValue('instructor_id', $instructor, PDO::PARAM_INT);
+        $consultaInsert->bindValue('categoria_id', $categoria, PDO::PARAM_INT);
+        $consultaInsert->bindValue(':imagen', $imagenBinario, PDO::PARAM_LOB);
+
+        $consultaInsert->execute();
+
         return array(true,"insertado con exito");
         
         }catch(PDOException $e){
@@ -35,7 +41,7 @@ class CursoClass{
         }
     }
 
-    static function editarCurso($id, $titulo, $descripcion, $costo, $categoria){
+    static function editarCurso($id, $titulo, $descripcion, $costo, $categoria, $imagen){
         self::inicializarConexion();
        
         $curso = CursoClass::buscarCursoByID($id);
@@ -45,17 +51,21 @@ class CursoClass{
            return array(false,"error en id");
         }
 
+        $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
+
         try{
             $sqlUpdate="update cursos set titulo = :titulo, descripcion = :descripcion, 
             costo = :costo, categoria_id = :categoria 
             where id= :id;";
             $sentencia = self::$conexion-> prepare($sqlUpdate);
-            $sentencia -> execute([ ':id'=>$id,
-                                    ':titulo'=>$titulo,
-                                    ':descripcion'=>$descripcion,
-                                    ':costo'=>$costo,
-                                    ':categoria'=>$categoria
-                                    ]);
+            $sentencia->bindValue(':id', $id, PDO::PARAM_INT);
+            $sentencia->bindValue(':titulo', $titulo, PDO::PARAM_STR);
+            $sentencia->bindValue('descripcion', $descripcion, PDO::PARAM_STR);
+            $sentencia->bindValue('costo', $costo, PDO::PARAM_STR);
+            $sentencia->bindValue('categoria_id', $categoria, PDO::PARAM_INT);
+            $sentencia->bindValue(':imagen', $imagenBinario, PDO::PARAM_LOB);
+
+            $sentencia -> execute();
             return array(true,"actualizado con exito");
         }catch(PDOException $e){
             return array(false, "Error al editar categoria: " . $e->getMessage());
@@ -82,7 +92,7 @@ class CursoClass{
         }catch(PDOException $e){
             return array(false, "Error al eliminar: " . $e->getMessage());
         }
-                                
+                           
     }
 
     static function buscarCursoByID($id){
@@ -202,6 +212,70 @@ class CursoClass{
            return null;
         }else{
             return $productos;
+        }
+    }
+
+    static function buscarCursos($valorBusqueda, $categoria_id, $instructor_id,$fecha_inicio, $fecha_fin){
+        self::inicializarConexion();
+        
+        try{
+        $sqlInsert="call BuscarCursos(:valorBusqueda, :categoria_id, :instructor_id, :fecha_inicio, :fecha_fin);";
+        $consultaInsert= self::$conexion->prepare($sqlInsert);
+        $consultaInsert->execute([
+            'valorBusqueda' => $valorBusqueda,
+            'categoria_id' => $categoria_id,
+            'instructor_id' => $instructor_id,
+            'fecha_inicio' => $fecha_inicio,
+            'fecha_fin' => $fecha_fin
+    ]);
+
+
+        $cursos = $consultaInsert->fetch(PDO::FETCH_ASSOC);
+        
+    
+        if(!$cursos) {
+        return null;
+        }else{
+            return $cursos;
+        }
+        
+        }catch(PDOException $e){
+            if ($e->errorInfo[1] == 1062) {
+                $cadena = "La categoria ya ha sido registrada.";
+                return array(false, $cadena);
+            } else {
+                return array(false, "Error al crear categoria: " . $e->getMessage());
+            }
+        }
+    }
+
+    static function buscarCursosPantallaPrincipal($filtro){
+        self::inicializarConexion();
+        
+        try{
+        $sqlInsert="call cursos_pantalla_principal (:filtro);";
+        $consultaInsert= self::$conexion->prepare($sqlInsert);
+        $consultaInsert->execute([
+            'filtro' => $filtro
+        ]);
+
+
+        $cursos = $consultaInsert->fetch(PDO::FETCH_ASSOC);
+        
+    
+        if(!$cursos) {
+        return null;
+        }else{
+            return $cursos;
+        }
+        
+        }catch(PDOException $e){
+            if ($e->errorInfo[1] == 1062) {
+                $cadena = "La categoria ya ha sido registrada.";
+                return array(false, $cadena);
+            } else {
+                return array(false, "Error al crear categoria: " . $e->getMessage());
+            }
         }
     }
 

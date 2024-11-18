@@ -70,25 +70,23 @@ switch ($_SERVER['REQUEST_METHOD']) {
                 //ejemplo json {"correo": "gato@animal.com","contrasena": "123","nombre": "CAT","rol":"vendedor","direccion":"calle 123"}
                 
                 extract($data);
-
-                if(empty($correo) || empty($contrasena) || empty($nombre) || empty($rol) || empty($genero) || empty($fecha_nac)){
+                if(empty($correo) || empty($contrasena) || empty($nombre) || empty($rol) || empty($genero) || empty($fecha_nac) || empty($imagen)){
                     echo json_encode(array("message" => "algun dato vacio", "error" => "empty"));
                     exit;
                 }
                 
-                //echo $rol;
 
-                $resultadoFuncion = UsuarioClass::registrarUsuario($correo, $contrasena, $nombre, $rol, $genero, $fecha_nac);
+                $resultadoFuncion = UsuarioClass::registrarUsuario($correo, $contrasena, $nombre, $rol, $genero, $fecha_nac, $imagen);
 
-               if ($resultadoFuncion[0]){
+                if ($resultadoFuncion[0]){
                 http_response_code(200);
                 echo json_encode(array("status" => "success", "message" => $resultadoFuncion[1]));
-               }else{
+                }else{
                 http_response_code(400);
                 echo json_encode(array("status" => "error", "message" => $resultadoFuncion[1]));
                 }
-               }
-               break;
+                }
+                break;
             }
     case 'PUT':
         {
@@ -97,12 +95,12 @@ switch ($_SERVER['REQUEST_METHOD']) {
             
             extract($data);
 
-            if(empty($correo) || empty($contrasena) || empty($id || empty($nombre))){
+            if(empty($correo) || empty($contrasena) || empty($id) || empty($nombre) || empty($imagen)){
                 echo "error en correo o contra o id";
                 exit;
             }
 
-            $resultadoFuncion = UsuarioClass::editarUsuario($id, $correo, $contrasena, $nombre);
+            $resultadoFuncion = UsuarioClass::editarUsuario($id, $correo, $contrasena, $nombre, $imagen);
             if ($resultadoFuncion[0]){
                 http_response_code(200);
                 echo json_encode(array("status" => "success", "message" => $resultadoFuncion[1]));

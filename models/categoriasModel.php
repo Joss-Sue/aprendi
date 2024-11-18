@@ -14,7 +14,7 @@ class CategoriaClass{
         self::inicializarConexion();
         
         try{
-        $sqlInsert="insert into categorias (nombre, descripcion, usuario_creador_id) values (:nombre, :descripcion, :createdBy);";
+        $sqlInsert="call insertarcategoria (:nombre, :descripcion, :createdBy);";
         $consultaInsert= self::$conexion->prepare($sqlInsert);
         $consultaInsert->execute(array(
         ':nombre'=>$nombre,

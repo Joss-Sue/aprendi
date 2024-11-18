@@ -38,7 +38,7 @@ class MensajesClass{
     static function buscarMesajes($id_curso, $id){
         
         self::inicializarConexion();
-        $sql="select * from mensajes where curso_id = :id_curso and (destinatario_id =:id or remitente_id=:id) order by fecha asc";
+        $sql="CALL ObtenerMensajesConUsuarios(:id_curso, id);";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id'=>$id,
         'id_curso'=>$id_curso]);

@@ -339,7 +339,7 @@ BEGIN
     LEFT JOIN 
         vista_inscripciones i ON c.id = i.curso_id
     WHERE
-        c.instructor_id = instructor_id_param   -- Filtramos por el instructor_id pasado como parámetro
+        c.instructor_id = instructor_id_param  
     GROUP BY 
         c.id, c.titulo
     ORDER BY 
@@ -356,7 +356,7 @@ CREATE PROCEDURE sp_kardex_estudiantes(IN estudiante_id_param INT)
 BEGIN
     SELECT 
         c.titulo AS curso_titulo,
-        ca.nombre AS categoria_nombre,  -- Aquí incluimos el campo 'nombre' de la tabla Categorias
+        ca.nombre AS categoria_nombre, 
         vi.progreso_curso,
         vi.fecha_inscripcion,
         vi.fecha_terminacion,
@@ -366,8 +366,7 @@ BEGIN
     JOIN 
         Cursos c ON vi.curso_id = c.id
     JOIN 
-        Categorias ca ON c.categoria_id = ca.id  -- Aquí hacemos el JOIN con Categorias para obtener 'nombre'
-    WHERE 
+        Categorias ca ON c.categoria_id = ca.id  
         vi.estudiante_id = estudiante_id_param;
 END //
 
@@ -399,3 +398,194 @@ DELIMITER ;
 ------------------------------------------------------------------------------------------------------
 -- cambios 08-11-2024 Final
 ------------------------------------------------------------------------------------------------------
+
+DROP PROCEDURE IF EXISTS InsertarUsuario;
+DELIMITER //
+
+CREATE PROCEDURE InsertarUsuario(
+    IN p_correo VARCHAR(100),
+    IN p_contrasena VARCHAR(100),
+    IN p_nombre VARCHAR(50),
+    IN p_rol VARCHAR(20),
+    IN p_genero VARCHAR(10),
+    IN p_fecha_nacimiento DATE,
+    IN p_foto MEDIUMBLOB
+)
+BEGIN
+    INSERT INTO usuarios (correo, contrasena, nombre, rol, genero, fecha_nacimiento, foto)
+    VALUES (p_correo, p_contrasena, p_nombre, p_rol, p_genero, p_fecha_nacimiento, p_foto);
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE InsertarCategoria(
+    IN p_nombre VARCHAR(100),
+    IN p_descripcion TEXT,
+    IN p_usuario_creador_id INT
+)
+BEGIN
+    -- Insertar el registro en la tabla Categorias
+    INSERT INTO Categorias (nombre, descripcion, usuario_creador_id)
+    VALUES (p_nombre, p_descripcion, p_usuario_creador_id);
+    
+END //
+
+DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE BuscarCursos(
+    IN p_valor_busqueda VARCHAR(255), 
+    IN p_categoria_id INT,
+	IN p_instructor_id INT,
+    IN p_fecha_inicio DATE, 
+    IN p_fecha_fin DATE 
+)
+BEGIN
+	SELECT 
+		c.id,
+		c.titulo,
+		c.descripcion,
+		c.costo,
+		c.estado,
+		c.fecha_creacion,
+		cat.nombre AS categoria,
+		u.nombre AS instructor
+	FROM Cursos c
+	INNER JOIN Categorias cat ON c.categoria_id = cat.id
+	INNER JOIN Usuarios u ON c.instructor_id = u.id
+	WHERE (p_valor_busqueda = '' OR c.titulo LIKE CONCAT('%', p_valor_busqueda, '%'))
+	AND c.estado = 1
+	AND c.categoria_id = IF (p_categoria_id <> 0, p_categoria_id, c.categoria_id )
+	AND c.instructor_id = IF (p_instructor_id <> 0, p_instructor_id, c.instructor_id )
+	AND DATE(c.fecha_creacion) BETWEEN p_fecha_inicio AND p_fecha_fin;
+
+END //
+
+DELIMITER ;
+
+CREATE VIEW reporteAdminInstructores
+AS
+SELECT 
+    u.correo AS usuario,
+    u.nombre,
+    u.fecha_registro AS fecha_ingreso,
+    COUNT(c.id) AS cantidad_cursos_ofrecidos,
+    COALESCE(SUM(i.precio_pagado), 0) AS total_ganancias
+FROM 
+    Usuarios u
+LEFT JOIN Cursos c ON u.id = c.instructor_id
+LEFT JOIN Inscripciones i ON c.id = i.curso_id
+WHERE 
+    u.rol = 'INSTRUCTOR'
+    AND u.estado = 1
+GROUP BY 
+    u.id;
+
+    DELIMITER //
+
+CREATE PROCEDURE ObtenerMensajesConUsuarios(
+    IN p_curso_id INT,
+    IN p_usuario_id INT
+)
+BEGIN
+    SELECT 
+        m.id AS mensaje_id,
+        m.curso_id,
+        m.contenido,
+        m.fecha,
+        remitente.id AS remitente_id,
+        remitente.nombre AS remitente_nombre,
+        destinatario.id AS destinatario_id,
+        destinatario.nombre AS destinatario_nombre
+    FROM 
+        Mensajes m
+    JOIN 
+        Usuarios remitente ON m.remitente_id = remitente.id
+    JOIN 
+        Usuarios destinatario ON m.destinatario_id = destinatario.id
+    WHERE 
+        m.curso_id = p_curso_id 
+        AND (m.destinatario_id = p_usuario_id OR m.remitente_id = p_usuario_id)	
+    ORDER BY 
+        m.fecha ASC;
+END//
+
+DELIMITER ;
+
+CREATE VIEW cursos_mas_vendidos
+AS
+SELECT 
+    c.id AS curso_id,
+    c.titulo,
+    c.descripcion,
+    c.costo,
+    c.fecha_creacion,
+    COUNT(i.estudiante_id) AS total_inscripciones
+FROM 
+    Cursos c
+LEFT JOIN 
+    Inscripciones i ON c.id = i.curso_id
+WHERE 
+    c.estado = 1 
+GROUP BY 
+    c.id
+ORDER BY 
+    total_inscripciones DESC
+LIMIT 5; 
+
+CREATE VIEW cursos_mas_recientes
+AS
+  SELECT 
+    id AS curso_id,
+    titulo,
+    descripcion,
+    costo,
+    fecha_creacion
+FROM 
+    Cursos
+WHERE 
+    estado = 1
+ORDER BY 
+    fecha_creacion DESC 
+LIMIT 5;
+
+CREATE VIEW cursos_mejor_calificados
+AS
+SELECT 
+    c.id AS curso_id,
+    c.titulo,
+    c.descripcion,
+    c.costo,
+    COALESCE(AVG(com.calificacion), 0) AS promedio_calificacion
+FROM 
+    Cursos c
+LEFT JOIN 
+    Comentarios com ON c.id = com.curso_id AND com.estado = 1 
+WHERE 
+    c.estado = 1 
+GROUP BY 
+    c.id
+ORDER BY 
+    promedio_calificacion DESC 
+LIMIT 5; 
+
+DELIMITER //
+
+CREATE PROCEDURE cursos_pantalla_principal(
+    IN p_filtro INT
+)
+BEGIN
+    -- Selecciona la vista basada en el valor de p_filtro
+    IF p_filtro = 1 THEN
+        SELECT * FROM cursos_mas_recientes;
+    ELSEIF p_filtro = 2 THEN
+        SELECT * FROM cursos_mejor_calificados;
+    ELSEIF p_filtro = 3 THEN
+        SELECT * FROM cursos_mas_vendidos;
+    END IF;
+END//
+
+DELIMITER ;

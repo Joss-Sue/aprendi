@@ -67,13 +67,13 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
             extract($data);
             
-            if(empty($titulo) || empty($descripcion) || empty($costo) || empty($instructor)){
+            if(empty($titulo) || empty($descripcion) || empty($costo) || empty($instructor) || empty ($imagen)){
                 http_response_code(400);
                 echo json_encode(array("status" => "error", "message" => "algun dato vacio"));
                 exit;
             }
 
-            $resultadoFuncion = CursoClass::registrarCurso($titulo, $descripcion, $costo, $instructor, $categoria);
+            $resultadoFuncion = CursoClass::registrarCurso($titulo, $descripcion, $costo, $instructor, $categoria, $imagen);
 
             if ($resultadoFuncion[0]){
                 http_response_code(200);
@@ -100,13 +100,13 @@ switch ($_SERVER['REQUEST_METHOD']) {
 
                 extract($data);
             
-                if(empty($titulo) || empty($descripcion) || empty($costo) || empty($id)){
+                if(empty($titulo) || empty($descripcion) || empty($costo) || empty($id) || empty($imagen) ){
                     http_response_code(400);
                     echo json_encode(array("status" => "error", "message" => "algun dato vacio"));
                     exit;
                 }
 
-                $resultadoFuncion = CursoClass::editarCurso($id, $titulo, $descripcion, $costo, $categoria);
+                $resultadoFuncion = CursoClass::editarCurso($id, $titulo, $descripcion, $costo, $categoria, $imagen);
                 if ($resultadoFuncion[0]){
                     http_response_code(200);
                     echo json_encode(array("status" => "success", "message" => $resultadoFuncion[1]));
