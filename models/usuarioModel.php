@@ -149,7 +149,10 @@ class UsuarioClass{
         $sentencia -> execute(['id'=>$id]);
     
         $usuario = $sentencia->fetch(PDO::FETCH_ASSOC);
-        
+
+        //$imagenBase64 = base64_encode($usuario['foto']);
+        $usuario['foto'] = 'data:image/png;base64,' . base64_encode($usuario['foto']);
+        //echo $usuario;
     
         if(!$usuario) {
            return null;

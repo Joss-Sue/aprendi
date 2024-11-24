@@ -10,6 +10,7 @@ document.getElementById('registroForm').addEventListener('submit', function(even
     const birthdate = document.getElementById('birthdate').value.trim();
     const email = document.getElementById('email').value.trim();
     const password = document.getElementById('password').value.trim();
+    const imagenInput = document.getElementById('avatar');
 
     const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -41,15 +42,33 @@ document.getElementById('registroForm').addEventListener('submit', function(even
         mostrarMensajeError('error-password', 'La contraseña debe tener al menos 8 caracteres, incluir una mayúscula, un número y un carácter especial.');
         valid = false;
     }
+    if (!imagenInput || imagenInput.files.length === 0) {
+        mostrarMensajeError('error-img', 'Necesitas agregar una imagen.');
+        valid = false;
+    }
 
     // Si hay algún error, no continuar
     if (!valid) {
         return;
     }
 
+    if (valid) {
+        const file = imagenInput.files[0];
+        convertirImagenABase64(file, function(imagenBase64) {
+            enviarFormulario(role, fullname, gender, birthdate, email, password, imagenBase64);
+        });
+    }
+    
     // Si todo es válido, enviar el formulario a la API
-    enviarFormulario();
+    //enviarFormulario();
 });
+function convertirImagenABase64(file, callback) {
+    const reader = new FileReader();
+    reader.onloadend = function() {
+        callback(reader.result);
+    };
+    reader.readAsDataURL(file);
+}
 
 // mostrar los mensajes de error
 function mostrarMensajeError(elementId, mensaje) {
@@ -69,18 +88,18 @@ function limpiarMensajesError() {
 }
 
 // Función para enviar los datos a la API
-function enviarFormulario() {
-    const formData = new FormData(document.getElementById('registroForm'));
+function enviarFormulario(role, fullname, gender, birthdate, email, password, imagenBase64) {
     const data = {
-        rol: formData.get('role'),
-        nombre: formData.get('fullname'),
-        genero: formData.get('gender'),
-        fecha_nac: formData.get('birthdate'),
-        correo: formData.get('email'),
-        contrasena: formData.get('password')
+        rol: role,
+        nombre: fullname,
+        genero: gender,
+        fecha_nac: birthdate,
+        correo: email,
+        contrasena: password,
+        imagen: imagenBase64
     };
     
-
+    console.log('Datos enviados a la API:', data);
     fetch('http://localhost/aprendi/api/usuariosController.php', {
         method: 'POST',
         headers: {
@@ -95,7 +114,11 @@ function enviarFormulario() {
         return response.json();
     })
     .then(data => {
-        mostrarModalExito(); // Mostrar el modal
+        if (data.status === 'success') {
+            mostrarModalExito(); // Mostrar el modal
+        } else {
+            throw new Error(data.message); // Lanzar error si hay un mensaje de error en la respuesta
+        }
     })
     .catch(error => {
         console.error('Error:', error);

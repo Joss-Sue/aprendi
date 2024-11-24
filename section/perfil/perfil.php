@@ -17,11 +17,13 @@ include("../../config/sessionVerif.php");
     <button class="return" onclick="history.back()">Regresar</button>
     <div class="container mt-5">
         <h3 class="text-center">Mi Perfil</h3>
+        <h4 id="rolusuario" class="text-center"></h4>
         <form id="perfilForm" class="mt-4">
             <div id="error-message" class="error-message"></div>
             <div class="mb-3 text-center">
-                <img src="../Imagenes/img-default.png" alt="Avatar" class="img-thumbnail" style="width: 150px;">
-                <input type="file" id="avatar" class="form-control mt-2" disabled>
+                <img src="" id="avatar" alt="Avatar" class="img-thumbnail" style="width: 150px;">
+                <input type="file" id="avatar" class="form-control mt-2">
+                <div id="error-img" class="error-message"></div>
             </div>
             <!-- Campo para el nombre completo -->
             <div class="mb-3">
@@ -141,12 +143,6 @@ include("../../config/sessionVerif.php");
                 .then(data => {
                     document.getElementById('footer-container').innerHTML = data;
                 });
-
-            // Funcionalidad para mostrar/ocultar buscador avanzado
-            document.getElementById('advancedSearchToggle').addEventListener('click', function() {
-                const advancedSearch = document.getElementById('advancedSearch');
-                advancedSearch.style.display = (advancedSearch.style.display === 'none' || advancedSearch.style.display === '') ? 'block' : 'none';
-            });
         });
 </script>
 </body>

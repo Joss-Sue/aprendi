@@ -49,7 +49,7 @@ if ($rol !== $rol_requerido) {
 
     <!-- Formulario para registrar curso -->
     <div class="container mt-4">
-        <form id="registroCursoForm" method="POST">
+        <form id="registroCursoForm">
         <input type="hidden" id="usuarioId" value="<?php echo $usuario_id; ?>">
             <!-- Selector de Curso -->
             <div class="mb-3">
@@ -90,8 +90,9 @@ if ($rol !== $rol_requerido) {
             </div>
 
             <div class="mb-3">
-                <label for="videoUpload" class="form-label">Subir Videos del Curso</label>
-                <input class="form-control" type="file" id="videoUpload" name="videoUpload[]" multiple accept="video/*" >
+                <label for="videoUpload" class="form-label">Subir imagen del Curso</label>
+                <input type="file" id="imagenCurso" accept="image/*" class="form-control">
+                <small id="error-imagenCurso" class="error-message"></small>
             </div>
             
             <button type="submit" class="btn btn-green">Registrar Curso</button>
