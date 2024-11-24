@@ -21,7 +21,7 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     $rol = $usuarioDatos['rol'];
 }
 
-$rol_requerido = "estudiante"; // El rol que puede acceder a esta página
+$rol_requerido = "instructor"; // El rol que puede acceder a esta página
 
 if ($rol !== $rol_requerido) {
     header("location:../index/index.php");

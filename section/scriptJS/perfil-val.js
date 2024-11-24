@@ -16,7 +16,11 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             if (data.status === 'success' || data.id) {
                 // Llenar los inputs con los datos obtenidos
-                const avatarUrl = data.avatar_url || '../Imagenes/img-default.png';
+                if (!data.foto) {
+                    throw new Error("La imagen del usuario no está disponible.");
+                }
+                // Llenar los inputs con los datos obtenidos
+                const avatarUrl = `${data.foto}`;
 
                 document.getElementById('avatar').src = avatarUrl;
                 document.getElementById('fullname').value = data.nombre;
@@ -33,6 +37,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
                 // Mostrar la contraseña en el input
                 document.getElementById('password').value = data.contrasena;
+                // Mostrar el rol
+                document.getElementById('rolusuario').innerText = `${data.rol}`;
             } else {
                 console.error("Error al obtener los datos del usuario:", data.message);
             }
@@ -51,6 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fullname = document.getElementById('fullname').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim(); 
+        const imagenInput = document.getElementById('avatar');
 
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
         const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
@@ -78,22 +85,38 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarMensajeError('error-password', 'La contraseña debe tener al menos 8 caracteres, incluir una mayúscula, un número y un carácter especial.');
             valid = false;
         }
-
+        // Validación de la imagen
+        if (!imagenInput || imagenInput.files.length === 0) {
+            mostrarMensajeError('error-img', 'Necesitas agregar una imagen.');
+            valid = false;
+        }        
         // Si todo es válido, enviar el formulario
         if (valid) {
-            enviarFormulario(fullname, email, password);
+            convertirImagenABase64(imagenInput.files[0], function (imagenBase64) {
+                console.log(imagenBase64);
+                enviarFormulario(fullname, email, password, imagenBase64);
+            });
         }
     });
 
+    function convertirImagenABase64(file, callback) {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            callback(reader.result);
+        };
+        reader.readAsDataURL(file);
+    }
+
     // Función para enviar los datos del perfil a la API
-    function enviarFormulario(fullname, email, password) {
+    function enviarFormulario(fullname, email, password, imagenBase64) {
         const data = {
             id: usuarioId,
             nombre: fullname,
             correo: email,
             contrasena: password !== '' ? password : undefined, // Enviar la contraseña si no está vacía
+            imagen: imagenBase64
         };
-
+    
         fetch('http://localhost/aprendi/api/usuariosController.php', {
             method: 'PUT',
             headers: {
@@ -101,17 +124,19 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             body: JSON.stringify(data)
         })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Error en la solicitud');
-            }
-            return response.json();
-        })
-        .then(data => {
-            if (data.status === 'success') {
-                mostrarModalExito();
-            } else {
-                throw new Error(data.message);
+        .then(response => response.text()) // Obtener la respuesta como texto primero
+        .then(responseText => {
+            console.log('Respuesta del servidor:', responseText); // Imprimir la respuesta para ver qué está sucediendo
+            try {
+                const data = JSON.parse(responseText); // Intentar convertir el texto en JSON
+                if (data.status === 'success') {
+                    mostrarModalExito();
+                } else {
+                    throw new Error(data.message);
+                }
+            } catch (error) {
+                console.error('Error al parsear la respuesta:', error.message);
+                throw new Error('La respuesta no es JSON válido: ' + responseText);
             }
         })
         .catch(error => {
@@ -119,6 +144,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('error-message').innerText = "Error al actualizar. Por favor, inténtalo de nuevo.";
         });
     }
+    
 
 // Mostrar el modal de confirmación antes de eliminar la cuenta
 document.getElementById('deleteAccountBtn').addEventListener('click', function(event) {

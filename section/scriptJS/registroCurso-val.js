@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const tituloInput = document.getElementById('titulo');
     const descripcionInput = document.getElementById('descripcion');
     const nivelesContainer = document.getElementById('nivelesContainer');
-
+    const imagenInput = document.getElementById('imagenCurso');
     const cantidadNivelesInputDos = document.getElementById('cantidad_niveles_nuevo');
     
     const usuarioId = document.getElementById('usuarioId') ? document.getElementById('usuarioId').value : null;
@@ -75,9 +75,17 @@ if (formRegistroCurso) {
                 mostrarMensajeError('error-descripcion', 'Debe ingresar una descripción.');
                 valid = false;
             }
+            if (imagenInput.files.length === 0) {
+                mostrarMensajeError('error-imagenCurso', 'Debe seleccionar una imagen.');
+                valid = false;
+            }
 
             if (valid) {
-                enviarFormularioCurso(usuarioId);
+                convertirImagenABase64(imagenInput.files[0], function (imagenBase64) {
+                    console.log(usuarioId);
+                    console.log(imagenBase64);
+                    enviarFormularioCurso(usuarioId, imagenBase64);
+                });
             }
         });
     } else {
@@ -91,6 +99,15 @@ if (formRegistroCurso) {
     // Deshabilitar el input de costo por nivel
     costoPorNivelInput.setAttribute('readonly', true);
 });
+
+// Función para convertir la imagen a Base64
+function convertirImagenABase64(file, callback) {
+    const reader = new FileReader();
+    reader.onloadend = function () {
+        callback(reader.result);
+    };
+    reader.readAsDataURL(file);
+}
 
 // Cargar categorías desde la API
 function cargarCategorias() {
@@ -140,15 +157,18 @@ function mostrarModalExito() {
 }
 
 // Enviar formulario de curso a la API
-function enviarFormularioCurso(usuarioId) {
+function enviarFormularioCurso(usuarioId, imagenBase64) {
     const formData = new FormData(document.getElementById('registroCursoForm'));
     const data = {
         titulo: formData.get('titulo'),
         descripcion: formData.get('descripcion'),
         costo: formData.get('costo_total'),
         instructor: usuarioId,
-        categoria: formData.get('categoria')
+        categoria: formData.get('categoria'),
+        imagen: imagenBase64
     };
+    console.log('Datos a enviar:', JSON.stringify(data));
+
 
     fetch('http://localhost/aprendi/api/cursoController.php', {
         method: 'POST',
@@ -162,7 +182,7 @@ function enviarFormularioCurso(usuarioId) {
         return response.json();
     })
     .then(data => {
-        if (data.success) {
+        if (data.status === 'success') {
             // Limpiar el formulario de registro de curso
             //document.getElementById('registroCursoForm').reset();
 
@@ -172,6 +192,8 @@ function enviarFormularioCurso(usuarioId) {
             // Mostrar el formulario de niveles y ocultar el de curso
             document.getElementById('registroCursoForm').style.display = 'none';
             document.getElementById('nivelesForm').style.display = 'block';
+        } else {
+            throw new Error(data.message || 'Error desconocido');
         }
     })
     .catch(error => {

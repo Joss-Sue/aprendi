@@ -68,6 +68,7 @@ if ($rol !== $rol_requerido) {
             <div class="card-body">
                 <h5 class="card-title" id="formularioTitulo">Registrar Nueva Categoría</h5>
                 <form id="formCategoria">
+                    <input type="hidden" id="categoriaId" name="categoriaId">
                     <div class="mb-3">
                         <label for="nombreCategoria" class="form-label">Nombre de la Categoría</label>
                         <input type="text" class="form-control" id="nombreCategoria" placeholder="Nombre de la categoría">
@@ -76,13 +77,15 @@ if ($rol !== $rol_requerido) {
                         <label for="descripcionCategoria" class="form-label">Descripción de la Categoría</label>
                         <textarea class="form-control" id="descripcionCategoria" rows="3" placeholder="Descripción de la categoría"></textarea>
                     </div>
-                    <button type="button" class="btn btn-green" id="btnGuardar" onclick="guardarCategoria()">Agregar Categoría</button>
+                    <button type="button" class="btn btn-green" id="btnGuardar" >Agregar Categoría</button>
+                    <button type="button" class="btn btn-green" id="btnEditar" style="display:none;">Editar Categoría</button>
                 </form>
             </div>
         </div>
     </div>
 
     <div id="footer-container"></div>
+    <script>const usuarioId = "<?php echo $usuario_id; ?>";</script>
     <script src="../scriptJS/registroCategoria-val.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
 <script>

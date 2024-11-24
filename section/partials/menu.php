@@ -69,8 +69,10 @@ if (isset($_SESSION['usuario_id'])) {
                         <?php if($rol == 'instructor'): ?>
                         <li><a class="dropdown-item" href="../cursos/RegistroCurso.php">Registrar Curso</a></li>
                         <?php endif; ?>
+                        <?php if ($rol == 'instructor'): ?>
+                        <li><a class="dropdown-item" href="../cursos/BajaCurso.php">Dar de Baja Curso</a></li>
+                        <?php endif; ?>
                         <?php if ($rol == 'estudiante'): ?>
-                        <li><a class="dropdown-item" href="../cursos/BajaCurso.php">Dar de Baja tu Curso</a></li>
                         <li><a class="dropdown-item" href="../cursos/mis-cursos.php">Mis Cursos</a></li>
                         <?php endif; ?>
                         <?php if ($rol == 'estudiante'|| $rol == 'instructor'||$rol == 'administrador' ): ?>

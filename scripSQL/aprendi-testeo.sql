@@ -192,7 +192,7 @@ CREATE TABLE IF NOT EXISTS Niveles (
     primary key (curso_id, nivel),
     FOREIGN KEY (curso_id) REFERENCES Cursos(id)
 );
-
+select*from Niveles;
 CREATE TABLE IF NOT EXISTS Certificados (
     estudiante_id INT NOT NULL COMMENT 'ID del estudiante que recibe el certificado',
     curso_id INT NOT NULL COMMENT 'ID del curso que ha completado el estudiante',
@@ -398,6 +398,36 @@ DELIMITER ;
 ------------------------------------------------------------------------------------------------------
 -- cambios 08-11-2024 Final
 ------------------------------------------------------------------------------------------------------
+-- login sp corregido
+drop procedure login_usuario;
+DELIMITER //
+
+CREATE PROCEDURE login_usuario(IN p_correo VARCHAR(255))
+BEGIN
+	SELECT nombre, correo, contrasena, id, rol  FROM usuarios WHERE correo = p_correo and estado = 1;
+END //
+
+DELIMITER ;
+drop procedure editar_usuario;
+DELIMITER //
+
+CREATE PROCEDURE editar_usuario(
+   
+    IN p_correo VARCHAR(255),
+    IN p_contrasena VARCHAR(255),
+    IN p_nombre VARCHAR(100),
+	IN p_id INT,
+    IN p_foto MEDIUMBLOB
+)
+BEGIN
+    UPDATE usuarios
+    SET correo = p_correo,
+        contrasena = p_contrasena,
+        nombre = p_nombre,
+        foto = p_foto
+    WHERE id = p_id;
+END //
+DELIMITER //
 
 DROP PROCEDURE IF EXISTS InsertarUsuario;
 DELIMITER //
@@ -466,6 +496,9 @@ END //
 
 DELIMITER ;
 
+DELIMITER //
+
+DROP VIEW IF EXISTS reporteAdminInstructores;
 CREATE VIEW reporteAdminInstructores
 AS
 SELECT 
@@ -483,8 +516,26 @@ WHERE
     AND u.estado = 1
 GROUP BY 
     u.id;
+    
+DELIMITER //
 
-    DELIMITER //
+CREATE VIEW reporteAdminEstudiantes AS
+SELECT 
+    u.correo AS usuario,
+    u.nombre,
+    u.fecha_registro AS fecha_ingreso,
+    COUNT(i.curso_id) AS cursos_inscritos,
+    COALESCE(AVG(vi.progreso_curso), 0) AS porcentaje_cursos_terminados
+FROM 
+    Usuarios u
+LEFT JOIN vista_inscripciones vi ON u.id = vi.estudiante_id
+LEFT JOIN Inscripciones i ON u.id = i.estudiante_id
+WHERE 
+    u.rol = 'ESTUDIANTE'
+    AND u.estado = 1
+GROUP BY 
+    u.id;
+DELIMITER //
 
 CREATE PROCEDURE ObtenerMensajesConUsuarios(
     IN p_curso_id INT,

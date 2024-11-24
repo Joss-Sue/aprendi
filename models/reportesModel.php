@@ -75,7 +75,7 @@ class ReporteClass{
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute();
     
-        $reporte = $sentencia->fetch(PDO::FETCH_ASSOC);
+        $reporte = $sentencia->fetchAll(PDO::FETCH_ASSOC);
         
     
         if(!$reporte) {
@@ -88,11 +88,11 @@ class ReporteClass{
     static function obtenerReporteAdminEstudiantes(){
         
         self::inicializarConexion();
-        $sql= ""; //aqui pones su sp o tu vista
+        $sql= "select * from reporteAdminEstudiantes;";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute();
     
-        $reporte = $sentencia->fetch(PDO::FETCH_ASSOC);
+        $reporte = $sentencia->fetchAll(PDO::FETCH_ASSOC);
         
     
         if(!$reporte) {

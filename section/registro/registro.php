@@ -64,6 +64,7 @@
                 <div class="mb-3">
                     <label for="avatar" class="form-label">Foto de Perfil</label>
                     <input type="file" class="form-control" id="avatar" name="avatar">
+                    <div id="error-img" style="color: red;"></div>
                 </div>
                 <button type="submit" class="btn btn-custom">Registrar</button>
                 <div id="error-message" style="color: red;"></div>

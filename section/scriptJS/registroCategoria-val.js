@@ -41,33 +41,51 @@ function editarCategoria(id, nombre, descripcion) {
     document.getElementById('nombreCategoria').value = nombre;
     document.getElementById('descripcionCategoria').value = descripcion;
     document.getElementById('formularioTitulo').innerText = 'Editar Categoría';
-    document.getElementById('btnGuardar').innerText = 'Guardar Cambios';
-    const modal = new bootstrap.Modal(document.getElementById('categoriaModal'));
-    modal.show();
+    document.getElementById('btnEditar').style.display = 'inline-block';
+    document.getElementById('btnGuardar').style.display = 'none';
 }
 
+function limpiarFormulario() {
+    document.getElementById('categoriaId').value = '';
+    document.getElementById('nombreCategoria').value = '';
+    document.getElementById('descripcionCategoria').value = '';
+    document.getElementById('formularioTitulo').innerText = 'Registrar Categoría';
+    document.getElementById('btnEditar').style.display = 'none';
+    document.getElementById('btnGuardar').style.display = 'inline-block';
+}
+
+document.getElementById('btnGuardar').addEventListener('click', function () {
+    guardarCategoria();
+});
+
+document.getElementById('btnEditar').addEventListener('click', function () {
+    actualizarCategoria();
+});
+
 function guardarCategoria() {
-    const id = document.getElementById('categoriaId').value;
     const nombre = document.getElementById('nombreCategoria').value;
     const descripcion = document.getElementById('descripcionCategoria').value;
+    const createdBy = usuarioId;
+
     if (nombre && descripcion) {
-        const metodo = id ? 'POST' : 'PUT';
-        const url = id ? `http://localhost/aprendi/api/categoriasController.php?id=${id}` : 'http://localhost/aprendi/api/categoriasController.php';
+        const url = 'http://localhost/aprendi/api/categoriaController.php';
+        const datos = { nombre, descripcion, createdBy };
 
         fetch(url, {
-            method: metodo,
+            method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ nombre, descripcion })
+            body: JSON.stringify(datos)
         })
         .then(response => {
             if (!response.ok) {
                 throw new Error('Error al guardar la categoría');
             }
-            return response.json();
+            return response.text();
         })
         .then(data => {
+            // Mostrar el modal de éxito solo si no hay errores
             mostrarModalExito('Categoría guardada con éxito');
             cargarCategorias();
             limpiarFormulario();
@@ -81,14 +99,54 @@ function guardarCategoria() {
     }
 }
 
+function actualizarCategoria() {
+    const id = document.getElementById('categoriaId').value;
+    const nombre = document.getElementById('nombreCategoria').value;
+    const descripcion = document.getElementById('descripcionCategoria').value;
+    const createdBy = usuarioId;
+
+    if (nombre && descripcion) {
+        const url = 'http://localhost/aprendi/api/categoriaController.php';
+        fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id, nombre, descripcion, createdBy })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al actualizar la categoría');
+            }
+            return response.json();
+        })
+        .then(data => {
+            mostrarModalExito('Categoría actualizada con éxito');
+            cargarCategorias();
+            limpiarFormulario();
+        })
+        .catch(error => {
+            mostrarModalError('Error al actualizar la categoría');
+            console.error('Error al actualizar la categoría:', error);
+        });
+    } else {
+        mostrarModalError('Por favor complete todos los campos.');
+    }
+}
+
 function prepararBorrarCategoria(id) {
     const confirmDeleteButton = document.getElementById('confirmDeleteButton');
     confirmDeleteButton.setAttribute('onclick', `borrarCategoria(${id})`);
 }
 
 function borrarCategoria(id) {
-    fetch(`http://localhost/aprendi/api/categoriasController.php?id=${id}`, {
-        method: 'DELETE'
+    const url = 'http://localhost/aprendi/api/categoriaController.php';
+    fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ id })
     })
     .then(response => {
         if (!response.ok) {
@@ -99,28 +157,14 @@ function borrarCategoria(id) {
     .then(data => {
         mostrarModalExito('Categoría eliminada con éxito');
         cargarCategorias();
+        const confirmDeleteModal = bootstrap.Modal.getInstance(document.getElementById('confirmDeleteModal'));
+        confirmDeleteModal.hide();
     })
     .catch(error => {
         mostrarModalError('Error al eliminar la categoría');
         console.error('Error al eliminar la categoría:', error);
     });
 }
-
-function limpiarFormulario() {
-    document.getElementById('categoriaId').value = '';
-    document.getElementById('nombreCategoria').value = '';
-    document.getElementById('descripcionCategoria').value = '';
-    document.getElementById('formularioTitulo').innerText = 'Registrar Categoría';
-    document.getElementById('btnGuardar').innerText = 'Agregar Categoría';
-}
-
-document.getElementById('btnGuardar').addEventListener('click', function () {
-    guardarCategoria();
-});
-
-document.getElementById('btnCancelar').addEventListener('click', function () {
-    limpiarFormulario();
-});
 
 function mostrarModalExito(mensaje) {
     const modalExito = new bootstrap.Modal(document.getElementById('successModal'));

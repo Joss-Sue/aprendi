@@ -61,12 +61,6 @@ function cargarNiveles(cursoId) {
                     // Crear el botón de compra
 
                     const compraButton = document.createElement('a');
-                    if(usuarioRol == 'estudiante'){
-                    compraButton.href = `../partials/FormaPago.php?curso_id=${cursoId}&id=${nivel.id}`;
-                    compraButton.textContent = 'Comprar';
-                    compraButton.classList.add('btn', 'btn-success', 'ml-3');
-                    compraButton.style.marginLeft = '10px';
-                    }
                     // Agregar el texto y el botón al elemento del nivel
                     nivelElement.appendChild(nivelText);
                     nivelElement.appendChild(compraButton);
