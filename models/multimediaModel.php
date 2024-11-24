@@ -111,6 +111,6 @@ class MultimediaClass{
             return $productos;
         }
     }
-
+//borrar
 }
 ?>

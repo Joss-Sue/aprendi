@@ -16,16 +16,15 @@ class CursoClass{
         $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
 
         try{
-        $sqlInsert="insert into cursos (titulo, descripcion, costo, instructor_id, categoria_id, imagen)
-        values (:titulo, :descripcion, :costo, :instructor, :categoria, :imagen);";
+        $sqlInsert="CALL registrar_curso( :titulo, :descripcion, :costo, :instructor, :categoria, :imagen);";
         $consultaInsert= self::$conexion->prepare($sqlInsert);
 
-        $consultaInsert->bindValue(':titulo', $titulo, PDO::PARAM_STR);
+        $consultaInsert->bindValue('titulo', $titulo, PDO::PARAM_STR);
         $consultaInsert->bindValue('descripcion', $descripcion, PDO::PARAM_STR);
         $consultaInsert->bindValue('costo', $costo, PDO::PARAM_STR);
         $consultaInsert->bindValue('instructor_id', $instructor, PDO::PARAM_INT);
         $consultaInsert->bindValue('categoria_id', $categoria, PDO::PARAM_INT);
-        $consultaInsert->bindValue(':imagen', $imagenBinario, PDO::PARAM_LOB);
+        $consultaInsert->bindValue('imagen', $imagenBinario, PDO::PARAM_LOB);
 
         $consultaInsert->execute();
 
@@ -54,16 +53,14 @@ class CursoClass{
         $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
 
         try{
-            $sqlUpdate="update cursos set titulo = :titulo, descripcion = :descripcion, 
-            costo = :costo, categoria_id = :categoria 
-            where id= :id;";
+            $sqlUpdate="CALL editar_curso (:id, :titulo, :descripcion, :costo, :categoria, :imagen;";
             $sentencia = self::$conexion-> prepare($sqlUpdate);
-            $sentencia->bindValue(':id', $id, PDO::PARAM_INT);
-            $sentencia->bindValue(':titulo', $titulo, PDO::PARAM_STR);
+            $sentencia->bindValue('id', $id, PDO::PARAM_INT);
+            $sentencia->bindValue('titulo', $titulo, PDO::PARAM_STR);
             $sentencia->bindValue('descripcion', $descripcion, PDO::PARAM_STR);
             $sentencia->bindValue('costo', $costo, PDO::PARAM_STR);
             $sentencia->bindValue('categoria_id', $categoria, PDO::PARAM_INT);
-            $sentencia->bindValue(':imagen', $imagenBinario, PDO::PARAM_LOB);
+            $sentencia->bindValue('imagen', $imagenBinario, PDO::PARAM_LOB);
 
             $sentencia -> execute();
             return array(true,"actualizado con exito");
@@ -98,11 +95,12 @@ class CursoClass{
     static function buscarCursoByID($id){
         
         self::inicializarConexion();
-        $sql="select * from cursos where id=:id and estado = 1";
+        $sql="CALL buscar_curso_id( :id )";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id'=>$id]);
     
         $producto = $sentencia->fetch(PDO::FETCH_ASSOC);
+        $usuario['imagen'] = 'data:image/png;base64,' . base64_encode($producto['imagen']);
         
     
         if(!$producto) {
@@ -112,7 +110,7 @@ class CursoClass{
         }
     }
 
-    static function contarFilas($tipo){
+    /*static function contarFilas($tipo){
         
         self::inicializarConexion();
         $arraySentencias=array("productosByAll"=>"select count(*) as filas from productos where activoProd = 1",
@@ -150,13 +148,13 @@ class CursoClass{
         }else{
             return $producto;
         }
-    }
+    }*/
 
     static function buscarAllCursos($pagina){
         $pagina=($pagina-1)*20;
         self::inicializarConexion();
         
-        $sql="select * from cursos where estado = 1 order by fecha_creacion desc limit 20 offset :pagina";
+        $sql="CALL buscar_all_cursos(:pagina)";
         
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia->bindValue(':pagina', $pagina, PDO::PARAM_INT);
@@ -176,7 +174,7 @@ class CursoClass{
         $pagina=($pagina-1)*20;
         self::inicializarConexion();
         
-        $sql="select * from cursos where estado = 1 and categoria_id = :categoria order by fecha_creacion desc limit 20 offset :pagina";
+        $sql="CALL buscar_por_categoria( :categoria , :pagina )";
         $sentencia = self::$conexion->prepare($sql);
         $sentencia->bindValue(':pagina', $pagina, PDO::PARAM_INT);
         $sentencia->bindValue(':categoria', $categoria, PDO::PARAM_INT);
@@ -196,7 +194,7 @@ class CursoClass{
         self::inicializarConexion();
         //$tipo="vendedor";
         
-        $sql="select * from cursos where instructor_id = :id order by fecha_creacion desc limit 20 offset :pagina";
+        $sql="CALL buscar_cursos_instructor( :id, :pagina)";
         
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia->bindValue(':pagina', $pagina, PDO::PARAM_INT,);

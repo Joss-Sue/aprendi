@@ -67,7 +67,7 @@ class InscripcionesClass{
     static function buscarInscripcionByID($curso_id, $estudiante_id){
         
         self::inicializarConexion();
-        $sql="select * from vista_inscripciones where curso_id = :curso_id and estudiante_id = :estudiante_id";
+        $sql="CALL buscar_inscripcion_id(:curso_id, :estudiante_id";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['curso_id'=>$curso_id,
         'estudiante_id'=>$estudiante_id]);
@@ -85,7 +85,7 @@ class InscripcionesClass{
     static function buscarAllInscripciones($id){
         
         self::inicializarConexion();
-        $sql="select * from vista_inscripciones where estudiante_id = :id";
+        $sql="CALL buscar_all_inscripciones(:id);";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id'=>$id]);
         
@@ -102,7 +102,7 @@ class InscripcionesClass{
     static function buscarAllInscripcionesIdcurso($curso_id){
         
         self::inicializarConexion();
-        $sql="select * from vista_inscripciones where curso_id = :curso_id";
+        $sql="CALL buscar_Inscripciones_Idcurso(:curso_id);";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['curso_id'=>$curso_id]);
         

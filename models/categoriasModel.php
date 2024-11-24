@@ -43,7 +43,7 @@ class CategoriaClass{
            return array(false,"error en id");
         }
         try{
-            $sqlUpdate="update categorias set nombre= :nombre, descripcion= :descripcion, usuario_creador_id= :createdBy where id= :id ";
+            $sqlUpdate="CALL editar_categorias (:id, :nombre, :descripcion, :createdBy)";
             $sentencia2 = self::$conexion-> prepare($sqlUpdate);
             $sentencia2 -> execute(array('nombre'=>$nombre,
                                     'descripcion'=>$descripcion,
@@ -68,7 +68,7 @@ class CategoriaClass{
            return array(false, "error en id");
         }
         try{
-        $sqlUpdate="update categorias set estado = 0 where id = :id";
+        $sqlUpdate="CALL eliminar_categoria( :id )";
         $sentencia2 = self::$conexion-> prepare($sqlUpdate);
         $sentencia2 -> execute(['id'=>$id]);
             //echo '<script>alert("You have been logged out.")</script>;'
@@ -82,7 +82,7 @@ class CategoriaClass{
     static function buscarCategoriaByID($id){
         
         self::inicializarConexion();
-        $sql="select * from categorias where id=:id";
+        $sql="CALL buscar_categoria_by_id(:id)";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id'=>$id]);
     
@@ -99,7 +99,7 @@ class CategoriaClass{
     static function buscarAllCategorias(){
         
         self::inicializarConexion();
-        $sql="select * from categorias where estado=1";
+        $sql="call buscar_all_categorias()";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute();
         

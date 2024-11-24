@@ -14,7 +14,7 @@ class MensajesClass{
         self::inicializarConexion();
         
         try{
-        $sqlInsert="insert into mensajes (remitente_id, destinatario_id, curso_id, contenido) values (:remitente_id, :destinatario_id, :curso_id, :contenido);";
+        $sqlInsert="CALL registrar_mensajes(1, 2, 1, 'Este es el contenido del mensaje');";
         $consultaInsert= self::$conexion->prepare($sqlInsert);
         $consultaInsert->execute(array(
         ':remitente_id'=>$remitente_id,

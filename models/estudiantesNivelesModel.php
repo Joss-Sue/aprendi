@@ -11,7 +11,7 @@ class EstudiantesNivelesClass {
     // Método para buscar los niveles completados por un estudiante en un curso
     static function buscarEstudianteNiveles($curso_id, $estudiante_id) {
         self::inicializarConexion();
-        $sql = "SELECT * FROM estudiantes_niveles WHERE curso_id = :curso_id AND estudiante_id = :estudiante_id";
+        $sql = "CALL buscar_estudiante_niveles(:curso_id, :estudiante_id)";
         $sentencia = self::$conexion->prepare($sql);
         $sentencia->execute(['curso_id' => $curso_id, 'estudiante_id' => $estudiante_id]);
         $result = $sentencia->fetchAll(PDO::FETCH_ASSOC);
@@ -23,8 +23,7 @@ class EstudiantesNivelesClass {
         self::inicializarConexion();
         
         try {
-            $sqlInsert = "insert into estudiantes_niveles (curso_id, nivel_id, estudiante_id) 
-                        values (:curso_id, :nivel_id, :estudiante_id)";
+            $sqlInsert = "CALL insertar_nivel_estudiante(:curso_id, :nivel_id, :estudiante_id)";
             $sentencia = self::$conexion->prepare($sqlInsert);
             $sentencia->execute([
                 ':curso_id' => $curso_id,

@@ -99,13 +99,15 @@ class UsuarioClass{
 
 
         try{
-        $sqlUpdate="call editar_usuario(:correo, :contrasena, :nombre, :id)";
+        $sqlUpdate="call editar_usuario(:correo, :contrasena, :nombre, :id, foto)";
         $sentencia = self::$conexion-> prepare($sqlUpdate);
 
         $sentencia->bindValue(':correo', $correo, PDO::PARAM_STR);
         $sentencia->bindValue(':contrasena', $contrasena, PDO::PARAM_STR);
         $sentencia->bindValue(':nombre', $nombre, PDO::PARAM_STR);
         $sentencia->bindValue(':id', $id, PDO::PARAM_INT);
+        $sentencia->bindValue(':foto', $imagenBinario, PDO::PARAM_LOB);
+
 
         $sentencia -> execute();
 
@@ -149,7 +151,10 @@ class UsuarioClass{
         $sentencia -> execute(['id'=>$id]);
     
         $usuario = $sentencia->fetch(PDO::FETCH_ASSOC);
-        
+
+        //$imagenBase64 = base64_encode($usuario['foto']);
+        $usuario['foto'] = 'data:image/png;base64,' . base64_encode($usuario['foto']);
+        //echo $usuario;
     
         if(!$usuario) {
            return null;
@@ -161,7 +166,7 @@ class UsuarioClass{
     static function buscarTodosLosUsuarios() {
         self::inicializarConexion();
     
-        $sql = "SELECT * FROM Usuarios"; //WHERE estado = :estado ['estado' => 1]
+        $sql = "call sp_select_usuarios()"; //WHERE estado = :estado ['estado' => 1]
         $sentencia = self::$conexion->prepare($sql);
         $sentencia->execute();
     
@@ -177,7 +182,7 @@ class UsuarioClass{
     static function actualizarEstadoUsuario($id, $estado) {
         self::inicializarConexion();
     
-        $sql = "UPDATE Usuarios SET estado = :estado WHERE id = :id";
+        $sql = "call sp_update_usuario_estado ( :id , :estado)";
         $sentencia = self::$conexion->prepare($sql);
         $resultado = $sentencia->execute(['estado' => $estado, 'id' => $id]);
     

@@ -34,7 +34,7 @@ class ReporteClass{
     static function obtenerVentasPorCurso($id_curso){
         
         self::inicializarConexion();
-        $sql= "sp_ventas_por_curso(:id_curso)";
+        $sql= "call sp_ventas_por_curso(:id_curso)";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id_usuario'=>$id_curso]);
     
@@ -71,7 +71,7 @@ class ReporteClass{
     static function obtenerReporteAdminIntructores(){
         
         self::inicializarConexion();
-        $sql= "select * from reporteAdminInstructores;";
+        $sql= "CALL obtener_reporte_adminInstructores();";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute();
     

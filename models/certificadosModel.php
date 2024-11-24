@@ -36,7 +36,7 @@ class CertificadoClass{
     static function buscarCertificadoByID($estudiante_id, $curso_id){
         
         self::inicializarConexion();
-        $sql="select * from certificados where estudiante_id = :estudiante_id and curso_id = :curso_id;";
+        $sql="CALL buscar_certificado_id ( :estudiante_id, :curso_id);";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['estudiante_id'=>$estudiante_id,
                             'curso_id'=>$curso_id]);
@@ -54,7 +54,7 @@ class CertificadoClass{
     static function buscarAllCertificados($id){
         
         self::inicializarConexion();
-        $sql="select * from certificados where estudiante_id = :id;";
+        $sql="ALL buscar_all_certificados (:id);";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute(['id'=>$id]);
         
