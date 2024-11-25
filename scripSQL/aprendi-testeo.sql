@@ -642,3 +642,57 @@ BEGIN
 END//
 
 DELIMITER ;
+
+-- cambios 24/11/2024-----------------------------------
+-------------------------------------------------------
+-------------------------------------------------------
+
+alter table niveles modify column url_video longblob;
+
+
+drop procedure registrarNivel;
+
+DELIMITER //
+CREATE PROCEDURE registrarNivel(
+    IN p_curso_id INT,
+    IN p_nivel INT,
+    IN p_url_video longblob,
+    IN p_descripcion TEXT
+)
+BEGIN
+    INSERT INTO niveles (curso_id, nivel, url_video, descripcion)
+    VALUES (p_curso_id, p_nivel, p_url_video, p_descripcion);
+END//
+
+drop procedure registrarNivel;
+DELIMITER //
+CREATE PROCEDURE registrarNivel(
+    IN p_curso_id INT,
+    IN p_nivel INT,
+    IN p_url_video longblob,
+    IN p_descripcion TEXT
+)
+BEGIN
+    INSERT INTO niveles (curso_id, nivel, url_video, descripcion)
+    VALUES (p_curso_id, p_nivel, p_url_video, p_descripcion);
+END//
+
+DELIMITER ;
+
+drop procedure editar_nivel;
+DELIMITER //
+CREATE PROCEDURE editar_nivel(
+    IN p_curso_id INT,
+    IN p_nivel INT,
+    IN p_descripcion TEXT,
+    IN p_url_video VARCHAR(255)
+)
+BEGIN
+    UPDATE niveles
+    SET 
+        descripcion = p_descripcion, 
+        url_video = p_url_video
+    WHERE curso_id = p_curso_id 
+      AND nivel = p_nivel;
+END//
+DELIMITER ;
