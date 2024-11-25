@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const fullname = document.getElementById('fullname').value.trim();
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim(); 
-        const imagenInput = document.getElementById('avatar');
+        const imagenInput = document.getElementById('avatarInput');
 
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
         const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;

@@ -22,7 +22,7 @@ include("../../config/sessionVerif.php");
             <div id="error-message" class="error-message"></div>
             <div class="mb-3 text-center">
                 <img src="" id="avatar" alt="Avatar" class="img-thumbnail" style="width: 150px;">
-                <input type="file" id="avatar" class="form-control mt-2">
+                <input type="file" id="avatarInput" class="form-control">
                 <div id="error-img" class="error-message"></div>
             </div>
             <!-- Campo para el nombre completo -->

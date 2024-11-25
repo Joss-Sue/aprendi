@@ -84,29 +84,12 @@ if ($rol !== $rol_requerido) {
                 </tr>
             </thead>
             <tbody>
-                <!-- Curso 1 -->
-                <tr>
-                    <td>Curso de Programación en Python</td>
-                    <td>150</td>
-                    <td>75%</td>
-                    <td>$15,000.00</td>
-                </tr>
-                <!-- Curso 2 -->
-                <tr>
-                    <td>Curso de Marketing Digital</td>
-                    <td>85</td>
-                    <td>60%</td>
-                    <td>$8,500.00</td>
-                </tr>
+                <!-- Las filas se llenarán dinámicamente -->
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="3" class="text-end"><strong>Total de ingresos (Tarjeta de crédito):</strong></td>
-                    <td>$18,000.00</td>
-                </tr>
-                <tr>
-                    <td colspan="3" class="text-end"><strong>Total de ingresos (Paypal):</strong></td>
-                    <td>$5,500.00</td>
+                    <td colspan="3" class="text-end"><strong>Total de ingresos:</strong></td>
+                    <td>$0.00</td>
                 </tr>
             </tfoot>
         </table>
@@ -124,36 +107,12 @@ if ($rol !== $rol_requerido) {
                 </tr>
             </thead>
             <tbody>
-                <!-- Alumno 1 -->
-                <tr>
-                    <td>Juan Pérez</td>
-                    <td>01 Sep 2024</td>
-                    <td>80%</td>
-                    <td>$100.00</td>
-                    <td>Tarjeta de crédito</td>
-                </tr>
-                <!-- Alumno 2 -->
-                <tr>
-                    <td>María López</td>
-                    <td>05 Sep 2024</td>
-                    <td>100%</td>
-                    <td>$120.00</td>
-                    <td>Paypal</td>
-                </tr>
-                <!-- Aquí se puede repetir según haya más alumnos -->
+                <!-- Las filas se llenarán dinámicamente -->
             </tbody>
             <tfoot>
                 <tr>
-                    <td colspan="4" class="text-end"><strong>Total de ingresos (Tarjeta de crédito):</strong></td>
-                    <td>$100.00</td>
-                </tr>
-                <tr>
-                    <td colspan="4" class="text-end"><strong>Total de ingresos (Paypal):</strong></td>
-                    <td>$120.00</td>
-                </tr>
-                <tr>
                     <td colspan="4" class="text-end"><strong>Total de ingresos:</strong></td>
-                    <td>$220.00</td>
+                    <td>$0.00</td>
                 </tr>
             </tfoot>
         </table>
@@ -161,7 +120,11 @@ if ($rol !== $rol_requerido) {
 
     <!-- Contenedor del Footer -->
     <div id="footer-container"></div>
-    
+
+    <script>
+        const usuarioId = "<?php echo $_SESSION['usuario_id']; ?>";
+    </script>
+        <script src="../scriptJS/reportesVentas-val.js"></script>
     <!-- Incluir el menú y el footer con JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
@@ -177,12 +140,6 @@ if ($rol !== $rol_requerido) {
                 .then(data => {
                     document.getElementById('footer-container').innerHTML = data;
                 });
-
-            // Funcionalidad para mostrar/ocultar buscador avanzado
-            document.getElementById('advancedSearchToggle').addEventListener('click', function() {
-                const advancedSearch = document.getElementById('advancedSearch');
-                advancedSearch.style.display = (advancedSearch.style.display === 'none' || advancedSearch.style.display === '') ? 'block' : 'none';
-            });
         });
     </script>
 </body>

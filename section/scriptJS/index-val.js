@@ -37,11 +37,14 @@ function mostrarCursos(cursos) {
     cursos.forEach(curso => {
         const courseCard = document.createElement('div');
         courseCard.classList.add('col-md-4');
+        
+        // Obtener la URL de la imagen en formato base64, si está disponible
+        const imagenCurso = curso.imagen ? `<img src="${curso.imagen}" class="card-img-top" alt="${curso.titulo}" style="height: 200px; object-fit: cover;">` : 
+                                           `<div class="card-img-top" style="background-color: #ccc; height: 200px; display: flex; align-items: center; justify-content: center;"><span style="color: #555;">Imagen no disponible</span></div>`;
+
         courseCard.innerHTML = `
             <div class="card course-card">
-                <div class="card-img-top" style="background-color: #ccc; height: 200px; display: flex; align-items: center; justify-content: center;">
-                    <span style="color: #555;">Imagen no disponible</span>
-                </div>
+                ${imagenCurso}
                 <div class="card-body">
                     <h5 class="card-title">${curso.titulo}</h5>
                     <p class="card-text">${curso.descripcion}</p>
@@ -53,6 +56,7 @@ function mostrarCursos(cursos) {
         container.appendChild(courseCard);
     });
 }
+
 
 function cargarCategorias() {
     fetch('http://localhost/aprendi/api/categoriaController.php')

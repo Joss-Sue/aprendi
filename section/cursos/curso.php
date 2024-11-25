@@ -199,18 +199,9 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
 
         <div class="video-section">
             <div id="videoContainer" class="video-container">
-                <video id="mainVideo" controls>
-                    <source src="ruta/a/tu/video1.mp4" type="video/mp4">
-                    Tu navegador no soporta la etiqueta de video.
-                </video>
+                <img id="imgcurso" class="imgcurso">
+                </img>
             </div>
-        </div>
-
-        <div class="thumbnail-container">
-            <img src="ruta/a/tu/video1_thumbnail.jpg" alt="Video 1" class="thumbnail" onclick="changeVideo('ruta/a/tu/video1.mp4')">
-            <img src="ruta/a/tu/video2_thumbnail.jpg" alt="Video 2" class="thumbnail" onclick="changeVideo('ruta/a/tu/video2.mp4')">
-            <img src="ruta/a/tu/video3_thumbnail.jpg" alt="Video 3" class="thumbnail" onclick="changeVideo('ruta/a/tu/video3.mp4')">
-            <img src="ruta/a/tu/video4_thumbnail.jpg" alt="Video 4" class="thumbnail" onclick="changeVideo('ruta/a/tu/video4.mp4')">
         </div>
 
         <div class="comprar-curso mt-4">
@@ -250,7 +241,7 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     <div id="footer-container"></div>
     <script>
                 const estudianteId = <?php echo json_encode($usuario_id); ?>;
-                const usuarioRol = <?php echo json_encode($rol); ?>; // "instructor" o "estudiante"
+                const usuarioRol = <?php echo json_encode($rol); ?>;
     </script>
     <script src="../scriptJS/valoracionCurso-val.js"></script>
     <script src="../scriptJS/detallesCurso-val.js"></script>
