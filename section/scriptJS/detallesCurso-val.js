@@ -11,6 +11,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (curso && curso.id) {
                     // Actualizar los elementos de la página con los datos del curso
                     document.querySelector('.course-header h1').textContent = curso.titulo;
+                    const imgElement = document.querySelector('.imgcurso');
+                    if (imgElement) {
+                        imgElement.src = curso.imagen; // Asignar la URL de la imagen al atributo src
+                    } else {
+                        console.error("No se encontró el elemento de imagen con la clase '.imgcurso'.");
+                    }
+
                     document.querySelector('.course-header p:nth-of-type(1)').textContent = `${curso.descripcion}`;
                     document.querySelector('.course-header p:nth-of-type(2)').textContent = `Costo: $${curso.costo}`;
 

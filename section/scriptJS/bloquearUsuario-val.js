@@ -13,7 +13,7 @@ function cargarUsuarios() {
     fetch('http://localhost/aprendi/api/usuariosController.php')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Error al cargar los usuarios');
+                throw new Error(`HTTP error! Status: ${response.status}`);
             }
             return response.json();
         })
@@ -21,13 +21,15 @@ function cargarUsuarios() {
             const usuariosContainer = document.getElementById('usuariosContainer');
             usuariosContainer.innerHTML = '';
             data.forEach(usuario => {
-                // Filtrar para que solo se muestren usuarios que no sean administradores
                 if (usuario.rol !== 'administrador') {
                     const usuarioElement = document.createElement('div');
                     usuarioElement.classList.add('usuario', 'card', 'mb-3', 'p-3', 'shadow-sm');
+                    const fotoUrl = usuario.foto 
+                        ? usuario.foto 
+                        : '../Imagenes/img-default.png';
                     usuarioElement.innerHTML = `
                         <div class="d-flex align-items-center mb-2">
-                            <img src="${usuario.foto || '../Imagenes/img-default.png'}" alt="Imagen del usuario" class="usuario-imagen rounded-circle me-3" style="width: 50px; height: 50px;">
+                            <img src="${fotoUrl}" alt="Imagen del usuario" class="usuario-imagen rounded-circle me-3" style="width: 50px; height: 50px;">
                             <div>
                                 <p class="mb-0 fw-bold usuario-nombre">${usuario.nombre}</p>
                                 <small class="text-muted usuario-correo">${usuario.correo}</small>
@@ -43,8 +45,12 @@ function cargarUsuarios() {
         })
         .catch(error => {
             console.error('Error al cargar los usuarios:', error);
+            const usuariosContainer = document.getElementById('usuariosContainer');
+            usuariosContainer.innerHTML = '<p class="text-danger">No se pudo cargar la lista de usuarios.</p>';
         });
 }
+
+
 
 // Función para filtrar usuarios por nombre o correo
 function filtrarUsuarios(query) {

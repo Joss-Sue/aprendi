@@ -193,7 +193,7 @@ class CursoClass{
     }
 
     static function buscarAllProductosWithID($pagina,$id){
-        $pagina=($pagina-1)*20;
+        $pagina = ($pagina - 1) * 20;
         self::inicializarConexion();
         //$tipo="vendedor";
         

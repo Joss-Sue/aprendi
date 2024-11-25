@@ -201,52 +201,48 @@ function enviarFormularioCurso(usuarioId, imagenBase64) {
 }
 
 function mostrarComboBoxCursos(usuarioId) {
-    fetch(`http://localhost/aprendi/api/cursoController.php?pagina=1&id=${usuarioId}`, {
+    fetch(`http://localhost/aprendi/api/cursoController.php?id=${usuarioId}&pagina=1`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
     })
     .then(response => {
-        console.log('Respuesta de la API para cursos:', response); // Agregamos este log para ver la respuesta en bruto
         if (!response.ok) {
-            throw new Error('Error al obtener los cursos');
+            throw new Error('Error al obtener los cursos del instructor');
         }
-        if (response.headers.get('Content-Length') === '0') {
+        return response.text(); // Leer la respuesta como texto primero
+    })
+    .then(responseText => {
+        console.log('Respuesta cruda de la API:', responseText);
+
+        if (!responseText) {
             throw new Error('La respuesta está vacía');
         }
-        return response.json();
-    })
-    .then(cursos => {
-        console.log('Cursos obtenidos:', cursos);
-        if (cursos && Array.isArray(cursos) && cursos.length > 0) {
-            const ultimoCurso = obtenerCursoMasReciente(cursos);
 
-            if (ultimoCurso) {
-                const cursosSelect = document.getElementById('cursosSelect');
-                cursosSelect.innerHTML = '';
+        // Intentar convertir la respuesta a JSON
+        const cursos = JSON.parse(responseText);
 
-                // Agregar solo el curso más reciente
-                const option = document.createElement('option');
-                option.value = ultimoCurso.id;
-                option.textContent = `${ultimoCurso.titulo}`;
-                cursosSelect.appendChild(option);
+        if (Array.isArray(cursos) && cursos.length > 0) {
+            console.log('Cursos obtenidos:', cursos);
+            const ultimoCurso = cursos[0];
+            const cursosSelect = document.getElementById('cursosSelect');
+            cursosSelect.innerHTML = ''; // Limpiar el combobox
 
-                // Deshabilitar el combo box para que no se pueda editar
-                cursosSelect.disabled = true;
+            const option = document.createElement('option');
+            option.value = ultimoCurso.id;
+            option.textContent = ultimoCurso.titulo;
+            cursosSelect.appendChild(option);
 
-                // Mostrar el formulario para añadir niveles
-                document.getElementById('nivelesForm').style.display = 'block';
+            cursosSelect.disabled = true;
 
-                // Generar automáticamente los inputs de niveles si se registró un número en el formulario anterior
-                const cantidadNiveles = parseInt(document.getElementById('cantidad_niveles').value);
-                if (cantidadNiveles > 0) {
-                    generarInputsNiveles(cantidadNiveles);
-                }
-            }
+            document.getElementById('nivelesForm').style.display = 'block';
+            generarInputsNiveles(parseInt(document.getElementById('cantidad_niveles').value, 10));
         } else {
-            console.warn('No se encontraron cursos para el usuario.');
+            console.warn('No se encontraron cursos para este instructor.');
         }
     })
-    .catch(error => console.error('Error al obtener cursos:', error));
+    .catch(error => {
+        console.error('Error al obtener los cursos:', error);
+    });
 }
 
 
