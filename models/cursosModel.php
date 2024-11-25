@@ -22,8 +22,8 @@ class CursoClass{
         $consultaInsert->bindValue('titulo', $titulo, PDO::PARAM_STR);
         $consultaInsert->bindValue('descripcion', $descripcion, PDO::PARAM_STR);
         $consultaInsert->bindValue('costo', $costo, PDO::PARAM_STR);
-        $consultaInsert->bindValue('instructor_id', $instructor, PDO::PARAM_INT);
-        $consultaInsert->bindValue('categoria_id', $categoria, PDO::PARAM_INT);
+        $consultaInsert->bindValue('instructor', $instructor, PDO::PARAM_INT);
+        $consultaInsert->bindValue('categoria', $categoria, PDO::PARAM_INT);
         $consultaInsert->bindValue('imagen', $imagenBinario, PDO::PARAM_LOB);
 
         $consultaInsert->execute();
@@ -59,7 +59,7 @@ class CursoClass{
             $sentencia->bindValue('titulo', $titulo, PDO::PARAM_STR);
             $sentencia->bindValue('descripcion', $descripcion, PDO::PARAM_STR);
             $sentencia->bindValue('costo', $costo, PDO::PARAM_STR);
-            $sentencia->bindValue('categoria_id', $categoria, PDO::PARAM_INT);
+            $sentencia->bindValue('categoria', $categoria, PDO::PARAM_INT);
             $sentencia->bindValue('imagen', $imagenBinario, PDO::PARAM_LOB);
 
             $sentencia -> execute();
@@ -150,24 +150,27 @@ class CursoClass{
         }
     }*/
 
-    static function buscarAllCursos($pagina){
-        $pagina=($pagina-1)*20;
+    static function buscarAllCursos($pagina) {
+        $pagina = ($pagina - 1) * 20;
         self::inicializarConexion();
-        
-        $sql="CALL buscar_all_cursos(:pagina)";
-        
-        $sentencia = self::$conexion-> prepare($sql);
+    
+        $sql = "CALL buscar_all_cursos(:pagina)";
+        $sentencia = self::$conexion->prepare($sql);
         $sentencia->bindValue(':pagina', $pagina, PDO::PARAM_INT);
         $sentencia->execute();
-        
     
         $productos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     
-        if(!$productos) {
-           return null;
-        }else{
-            return $productos;
+        // Convertir las imágenes binarias a Base64 en todos los productos
+        if ($productos) {
+            foreach ($productos as &$producto) {
+                if (isset($producto['imagen'])) {
+                    $producto['imagen'] = 'data:image/png;base64,' . base64_encode($producto['imagen']);
+                }
+            }
         }
+    
+        return $productos ?: null;
     }
 
     static function buscarByCategoria($pagina,$categoria){
@@ -229,6 +232,14 @@ class CursoClass{
 
 
         $cursos = $consultaInsert->fetch(PDO::FETCH_ASSOC);
+
+        if ($cursos) {
+            foreach ($cursos as &$cursos) {
+                if (isset($cursos['imagen'])) {
+                    $cursos['imagen'] = 'data:image/png;base64,' . base64_encode($cursos['imagen']);
+                }
+            }
+        }
         
     
         if(!$cursos) {
@@ -259,6 +270,15 @@ class CursoClass{
 
 
         $cursos = $consultaInsert->fetch(PDO::FETCH_ASSOC);
+
+
+        if ($cursos) {
+            foreach ($cursos as &$cursos) {
+                if (isset($cursos['imagen'])) {
+                    $cursos['imagen'] = 'data:image/png;base64,' . base64_encode($cursos['imagen']);
+                }
+            }
+        }
         
     
         if(!$cursos) {

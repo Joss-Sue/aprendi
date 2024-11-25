@@ -12,16 +12,19 @@ class NivelClass{
 
     static function registrarNivel($nivel, $url_video, $descripcion, $curso_id){
         self::inicializarConexion();
+        $videoBinario = base64_decode(preg_replace('#^data:(\w+/[\w-]+);base64,#i', '', $url_video));
+
         
         try{
         $sqlInsert="CALL registrarNivel (:curso_id, :nivel, :url_video, :descripcion);";
         $consultaInsert= self::$conexion->prepare($sqlInsert);
-        $consultaInsert->execute(array(
-        ':curso_id'=>$curso_id,
-        ':nivel'=>$nivel,
-        ':url_video'=>$url_video,
-        ':descripcion'=>$descripcion
-        ));
+
+        $consultaInsert->bindValue(':curso_id', $curso_id, PDO::PARAM_INT);
+        $consultaInsert->bindValue(':nivel', $nivel, PDO::PARAM_INT);
+        $consultaInsert->bindValue(':url_video', $videoBinario, PDO::PARAM_LOB);
+        $consultaInsert->bindValue(':descripcion', $descripcion, PDO::PARAM_STR);
+
+        $consultaInsert->execute();
 
         return array(true,"insertado con exito");
         
@@ -38,19 +41,21 @@ class NivelClass{
     static function editarNivel($curso_id, $nivel, $descripcion, $url_video){
         self::inicializarConexion();
         $niveles = NivelClass::buscarNivelByID($curso_id, $nivel);
-        
+        $videoBinario = base64_decode(preg_replace('#^data:(\w+/[\w-]+);base64,#i', '', $url_video));
     
         if($niveles==null) {
            return array(false,"error en id");
         }
         try{
             $sqlUpdate="update niveles set nivel= :nivel, descripcion = :descripcion, url_video = :url_video where curso_id = :curso_id and nivel = :nivel;";
-            $sentencia2 = self::$conexion-> prepare($sqlUpdate);
-            $sentencia2 -> execute(array('nivel'=>$nivel,
-                                    'descripcion'=>$descripcion,
-                                    'url_video'=>$url_video,
-                                'curso_id'=>$curso_id,
-                            'nivel'=>$nivel));
+            $consultaInsert = self::$conexion-> prepare($sqlUpdate);
+
+            $consultaInsert->bindValue(':curso_id', $curso_id, PDO::PARAM_INT);
+            $consultaInsert->bindValue(':nivel', $nivel, PDO::PARAM_INT);
+            $consultaInsert->bindValue(':url_video', $videoBinario, PDO::PARAM_LOB);
+            $consultaInsert->bindValue(':descripcion', $descripcion, PDO::PARAM_STR);
+
+            $consultaInsert -> execute();
             return array(true,"actualizado con exito");
         }catch(PDOException $e){
             return array(false, "Error al editar el nivel: " . $e->getMessage());
@@ -91,6 +96,10 @@ class NivelClass{
         'nivel'=>$nivel]);
     
         $categoria = $sentencia->fetch(PDO::FETCH_ASSOC);
+
+
+        $categoria['url_video'] = 'data:video/mp4;base64,' . base64_encode($categoria['url_video']);
+
         
     
         if(!$categoria) {
@@ -108,12 +117,20 @@ class NivelClass{
         $sentencia -> execute(['id'=>$id]);
         
     
-        $categorias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+        $cursos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+
+        if ($cursos) {
+            foreach ($cursos as &$cursos) {
+                if (isset($cursos['url_video'])) {
+                    $cursos['url_video'] = 'data:video/mp4;base64,' . base64_encode($cursos['url_video']);
+                }
+            }
+        }
     
-        if(!$categorias) {
+        if(!$cursos) {
            return null;
         }else{
-            return $categorias;
+            return $cursos;
         }
     }
 
