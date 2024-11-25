@@ -696,3 +696,18 @@ BEGIN
       AND nivel = p_nivel;
 END//
 DELIMITER ;
+
+DELIMITER //
+
+CREATE PROCEDURE ObtenerUltimoIDPorInstructor(
+    IN p_instructor_id INT
+)
+BEGIN
+    -- Obtener el mayor ID para el instructor especificado
+    SELECT id
+    FROM Cursos
+    WHERE instructor_id = p_instructor_id
+    order by id desc limit 1;
+END//
+
+DELIMITER ;
