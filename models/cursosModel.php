@@ -297,5 +297,22 @@ class CursoClass{
         }
     }
 
+    static function ultimoCursoInstructor($id){
+
+        self::inicializarConexion();
+        $sql="call ObtenerUltimoIDPorInstructor(:id);";
+        $sentencia = self::$conexion-> prepare($sql);
+        $sentencia -> execute(['id' => $id]);
+        
+    
+        $categorias = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+    
+        if(!$categorias) {
+           return null;
+        }else{
+            return $categorias;
+        }
+    }
+
 }
 ?>
