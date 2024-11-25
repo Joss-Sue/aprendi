@@ -82,8 +82,6 @@ if (formRegistroCurso) {
 
             if (valid) {
                 convertirImagenABase64(imagenInput.files[0], function (imagenBase64) {
-                    console.log(usuarioId);
-                    console.log(imagenBase64);
                     enviarFormularioCurso(usuarioId, imagenBase64);
                 });
             }
@@ -167,8 +165,8 @@ function enviarFormularioCurso(usuarioId, imagenBase64) {
         categoria: formData.get('categoria'),
         imagen: imagenBase64
     };
-    console.log('Datos a enviar:', JSON.stringify(data));
 
+    console.log('Datos a enviar:', JSON.stringify(data));
 
     fetch('http://localhost/aprendi/api/cursoController.php', {
         method: 'POST',
@@ -177,39 +175,48 @@ function enviarFormularioCurso(usuarioId, imagenBase64) {
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Error en la solicitud');
+            return response.json().then(errorData => {
+                throw new Error(`Error en la solicitud: ${errorData.message || 'Sin mensaje de error'}`);
+            });
         }
         return response.json();
     })
     .then(data => {
-        if (data.status === 'success') {
-            // Limpiar el formulario de registro de curso
-            //document.getElementById('registroCursoForm').reset();
-
-            // Actualizar el combo box con el último curso registrado
-            mostrarComboBoxCursos(usuarioId);
-
+        console.log("Respuesta de la API: ", data); // Log para diagnosticar la respuesta de la API
+        if (data.success) {
             // Mostrar el formulario de niveles y ocultar el de curso
             document.getElementById('registroCursoForm').style.display = 'none';
             document.getElementById('nivelesForm').style.display = 'block';
+
+            // Actualizar el combo box con el último curso registrado
+            mostrarComboBoxCursos(usuarioId);
         } else {
-            throw new Error(data.message || 'Error desconocido');
+            throw new Error(`Error del servidor: ${data.message || 'Sin mensaje de error'}`);
         }
     })
     .catch(error => {
         console.error('Error al registrar el curso:', error);
+        alert(`Error al registrar el curso: ${error.message}`);
     });
 }
+
 function mostrarComboBoxCursos(usuarioId) {
     fetch(`http://localhost/aprendi/api/cursoController.php?pagina=1&id=${usuarioId}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' }
     })
     .then(response => {
-        if (!response.ok) throw new Error('Error al obtener los cursos');
+        console.log('Respuesta de la API para cursos:', response); // Agregamos este log para ver la respuesta en bruto
+        if (!response.ok) {
+            throw new Error('Error al obtener los cursos');
+        }
+        if (response.headers.get('Content-Length') === '0') {
+            throw new Error('La respuesta está vacía');
+        }
         return response.json();
     })
     .then(cursos => {
+        console.log('Cursos obtenidos:', cursos);
         if (cursos && Array.isArray(cursos) && cursos.length > 0) {
             const ultimoCurso = obtenerCursoMasReciente(cursos);
 
@@ -235,10 +242,13 @@ function mostrarComboBoxCursos(usuarioId) {
                     generarInputsNiveles(cantidadNiveles);
                 }
             }
+        } else {
+            console.warn('No se encontraron cursos para el usuario.');
         }
     })
     .catch(error => console.error('Error al obtener cursos:', error));
 }
+
 
 function obtenerCursoMasReciente(cursos) {
     let ultimoCurso = null;
@@ -289,20 +299,21 @@ function generarInputsNiveles(cantidadNiveles) {
 }
 
 
-function registrarNiveles() {
+async function registrarNiveles() {
     const nivelesUrls = document.querySelectorAll('.nivel-url');
     const nivelesDescripciones = document.querySelectorAll('.nivel-descripcion');
     const cursoId = document.getElementById('cursosSelect').value;
 
-    const nivelesData = [];
     let valid = true;
+    const nivelesData = [];
 
-nivelesUrls.forEach((urlInput, index) => {
+    // Validar todos los niveles
+    for (let index = 0; index < nivelesUrls.length; index++) {
+        const urlInput = nivelesUrls[index];
         const descripcionInput = nivelesDescripciones[index];
         const urlError = document.getElementById(`error-url-${index + 1}`);
         const descripcionError = document.getElementById(`error-descripcion-${index + 1}`);
 
-        // Validar URL
         if (!urlInput.value.trim() || /^[^a-zA-Z0-9]*$/.test(urlInput.value)) {
             urlError.textContent = 'La URL no puede estar vacía ni contener solo símbolos.';
             valid = false;
@@ -310,7 +321,6 @@ nivelesUrls.forEach((urlInput, index) => {
             urlError.textContent = '';
         }
 
-        // Validar Descripción
         if (!descripcionInput.value.trim() || /^[^a-zA-Z0-9]*$/.test(descripcionInput.value)) {
             descripcionError.textContent = 'La descripción no puede estar vacía ni contener solo símbolos.';
             valid = false;
@@ -326,46 +336,47 @@ nivelesUrls.forEach((urlInput, index) => {
                 descripcion: descripcionInput.value.trim()
             });
         }
-    });
+    }
 
-    if (nivelesData.length > 0) {
-        // Enviar los datos nivel por nivel en lugar de un array
-        nivelesData.forEach(nivel => {
-            fetch('http://localhost/aprendi/api/nivelesController.php', {
+    if (!valid || nivelesData.length === 0) {
+        console.warn("No hay niveles válidos para registrar.");
+        return;
+    }
+
+    // Enviar cada nivel de manera secuencial
+    try {
+        for (let i = 0; i < nivelesData.length; i++) {
+            const nivel = nivelesData[i];
+            await fetch('http://localhost/aprendi/api/nivelesController.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(nivel)
-            })
-            .then(response => {
+            }).then(response => {
                 if (!response.ok) {
-                    throw new Error('Error en la solicitud al registrar niveles');
+                    throw new Error('Error en la solicitud al registrar el nivel');
                 }
                 return response.json();
-            })
-            .then(responseData => {
-                if (responseData.success) {
-                // Mostrar el modal de éxito
-                mostrarModalExito();
-
-                // Limpiar el formulario de niveles
-                document.getElementById('registroCursoForm').reset();
-                //document.getElementById('cantidad_niveles_nuevo').value = '';
-                document.getElementById('nivelesContainer').innerHTML = '';
-
-                // Ocultar el formulario de niveles y mostrar el de cursos
-                document.getElementById('registroCursoForm').style.display = 'block';
-                document.getElementById('nivelesForm').style.display = 'none';
-                } else {
-                    console.error("Error al registrar el nivel:", responseData.message);
+            }).then(responseData => {
+                if (!responseData.success) {
+                    throw new Error(responseData.message || 'Error desconocido al registrar el nivel');
                 }
-            })
-            .catch(error => {
-                console.error('Error al registrar niveles:', error);
-                alert("Ocurrió un error al registrar los niveles.");
             });
-        });
-    } else {
-        console.warn("No hay niveles para registrar.");
+        }
+
+        // Mostrar el modal de éxito después de registrar todos los niveles
+        mostrarModalExito();
+
+        // Limpiar el formulario de niveles
+        document.getElementById('registroCursoForm').reset();
+        document.getElementById('nivelesContainer').innerHTML = '';
+
+        // Ocultar el formulario de niveles y mostrar el de cursos
+        document.getElementById('registroCursoForm').style.display = 'block';
+        document.getElementById('nivelesForm').style.display = 'none';
+    } catch (error) {
+        console.error('Error al registrar niveles:', error);
+        alert("Ocurrió un error al registrar los niveles.");
     }
 }
+
 

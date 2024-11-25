@@ -22,8 +22,8 @@ class CursoClass{
         $consultaInsert->bindValue('titulo', $titulo, PDO::PARAM_STR);
         $consultaInsert->bindValue('descripcion', $descripcion, PDO::PARAM_STR);
         $consultaInsert->bindValue('costo', $costo, PDO::PARAM_STR);
-        $consultaInsert->bindValue('instructor_id', $instructor, PDO::PARAM_INT);
-        $consultaInsert->bindValue('categoria_id', $categoria, PDO::PARAM_INT);
+        $consultaInsert->bindValue('instructor', $instructor, PDO::PARAM_INT);
+        $consultaInsert->bindValue('categoria', $categoria, PDO::PARAM_INT);
         $consultaInsert->bindValue('imagen', $imagenBinario, PDO::PARAM_LOB);
 
         $consultaInsert->execute();
@@ -59,7 +59,7 @@ class CursoClass{
             $sentencia->bindValue('titulo', $titulo, PDO::PARAM_STR);
             $sentencia->bindValue('descripcion', $descripcion, PDO::PARAM_STR);
             $sentencia->bindValue('costo', $costo, PDO::PARAM_STR);
-            $sentencia->bindValue('categoria_id', $categoria, PDO::PARAM_INT);
+            $sentencia->bindValue('categoria', $categoria, PDO::PARAM_INT);
             $sentencia->bindValue('imagen', $imagenBinario, PDO::PARAM_LOB);
 
             $sentencia -> execute();
