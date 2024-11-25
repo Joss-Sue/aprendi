@@ -38,50 +38,50 @@ if ($rol !== $rol_requerido) {
     <link rel="stylesheet" href="../styles/index.css">
 </head>
 <style>
-    .curso-card {
-    width: 300px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    overflow: hidden;
-    margin: 20px;
-    display: inline-block;
-    vertical-align: top;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
+        .curso-card {
+        width: 300px;
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        margin: 20px;
+        display: inline-block;
+        vertical-align: top;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
 
-.curso-card:hover {
-    transform: translateY(-5px);
-}
+    .curso-card:hover {
+        transform: translateY(-5px);
+    }
 
-.curso-card-content {
-    text-align: center;
-    padding: 20px;
-}
+    .curso-card-content {
+        text-align: center;
+        padding: 20px;
+    }
 
-.curso-img {
-    width: 100%;
-    height: 200px;
-    object-fit: cover;
-}
+    .curso-img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+    }
 
-.curso-info h5 {
-    font-size: 1.25rem;
-    margin: 10px 0;
-}
+    .curso-info h5 {
+        font-size: 1.25rem;
+        margin: 10px 0;
+    }
 
-.progreso {
-    background-color: #e0e0e0;
-    border-radius: 5px;
-    height: 10px;
-    margin: 10px 0;
-}
+    .progreso {
+        background-color: #e0e0e0;
+        border-radius: 5px;
+        height: 10px;
+        margin: 10px 0;
+    }
 
-.progreso-bar {
-    background-color: #4caf50;
-    height: 100%;
-    border-radius: 5px;
-}
+    .progreso-bar {
+        background-color: #4caf50;
+        height: 100%;
+        border-radius: 5px;
+    }
 
 </style>
 <body>

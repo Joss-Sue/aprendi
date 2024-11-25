@@ -27,17 +27,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             return response.json();
         })
-        .then(inscripciones => {
-            if (Array.isArray(inscripciones) && inscripciones.length > 0) {
-                cursosContainer.innerHTML = ''; // Limpiar el contenedor antes de agregar los cursos
-
-                // Hacer una solicitud para cada curso inscrito y obtener su progreso
-                inscripciones.forEach(inscripcion => {
+        .then(data => {
+            console.log("Datos recibidos del servidor:", data); // Verifica los datos aquí
+            cursosContainer.innerHTML = ''; // Limpiar el contenedor UNA vez
+    
+            if (Array.isArray(data) && data.length > 0) {
+                // Iterar solo una vez
+                data.forEach(inscripcion => {
                     console.log("Curso ID:", inscripcion.curso_id);
                     console.log("Progreso desde API:", inscripcion.progreso_curso);
                     obtenerDetallesCurso(inscripcion.curso_id, inscripcion.estudiante_id);
                 });
             } else {
+                console.error("No hay cursos inscritos.");
                 cursosContainer.innerHTML = '<p>No tienes cursos inscritos.</p>';
             }
         })
@@ -49,15 +51,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
     // Función para obtener los detalles del curso usando el cursoController.php
 function obtenerDetallesCurso(cursoId, estudianteId) {
+    console.log(`Obteniendo detalles para cursoId: ${cursoId}, estudianteId: ${estudianteId}`);
     const urlCurso = `http://localhost/aprendi/api/cursoController.php?id=${encodeURIComponent(cursoId)}`;
     const urlProgreso = `http://localhost/aprendi/api/inscripcionesController.php?curso_id=${cursoId}&estudiante_id=${estudianteId}`;
 
-    // Obtener detalles del curso y el progreso en paralelo
     Promise.all([
-        fetch(urlCurso).then(res => res.json()),
-        fetch(urlProgreso).then(res => res.json())
+        fetch(urlCurso).then(res => {
+            console.log("Respuesta de cursoController:", res);
+            return res.text(); // Cambiar a .text() para inspeccionar el contenido exacto
+        }),
+        fetch(urlProgreso).then(res => {
+            console.log("Respuesta de progreso:", res);
+            return res.text();
+        })
     ])
-    .then(([curso, progresoData]) => {
+    .then(([cursoResponse, progresoResponse]) => {
+        console.log("Datos crudos de cursoController:", cursoResponse);
+        console.log("Datos crudos de progresoController:", progresoResponse);
+    
+        // Intenta parsear JSON solo si es válido
+        const curso = JSON.parse(cursoResponse);
+        const progresoData = JSON.parse(progresoResponse);
+    
         if (curso && curso.id) {
             const progreso = progresoData && progresoData.progreso_curso ? parseFloat(progresoData.progreso_curso) : 0;
             console.log(`Progreso calculado para el curso ${curso.id}: ${progreso}%`);
@@ -68,11 +83,14 @@ function obtenerDetallesCurso(cursoId, estudianteId) {
         }
     })
     .catch(error => {
-        console.error('Error al obtener los detalles del curso o el progreso:', error);
+        console.error('Error al procesar las solicitudes paralelas:', error);
     });
+    
+    
 }
 // Función para crear el elemento del curso con el progreso actualizado
 function crearElementoCurso(curso, progreso) {
+    console.log("Creando elemento para el curso:", curso, "Progreso:", progreso);
     const cursoDiv = document.createElement('div');
     cursoDiv.classList.add('curso-card');
 
@@ -80,20 +98,20 @@ function crearElementoCurso(curso, progreso) {
     const descripcion = curso.descripcion || 'Sin descripción';
 
     cursoDiv.innerHTML = `
-        <div class="curso-card-content">
-            <img src="../img/default.png" alt="${titulo}" class="curso-img">
-            <div class="curso-info">
-                <h5>${titulo}</h5>
-                <p>${descripcion}</p>
-                <div class="progreso">
-                    <div class="progreso-bar" style="width: ${progreso}%"></div>
-                </div>
-                <p>Progreso: ${progreso.toFixed(2)}%</p>
-                <a href="../cursos/contenido-curso.php?id=${curso.id}" class="btn btn-green comenzar-curso-btn" data-curso-id="${curso.id}" data-estudiante-id="${usuarioId}">Comenzar</a>
+    <div class="curso-card-content">
+        <img src="${curso.imagen || '../img/default.png'}" alt="${titulo}" class="curso-img">
+        <div class="curso-info">
+            <h5>${titulo}</h5>
+            <p>${descripcion}</p>
+            <div class="progreso">
+                <div class="progreso-bar" style="width: ${progreso}%"></div>
             </div>
+            <p>Progreso: ${progreso.toFixed(2)}%</p>
+            <a href="../cursos/contenido-curso.php?id=${curso.id}" class="btn btn-green comenzar-curso-btn" data-curso-id="${curso.id}" data-estudiante-id="${usuarioId}">Comenzar</a>
         </div>
-    `;
-
+    </div>
+`;
+console.log("Elemento creado:", cursoDiv);
         // Añadir evento para actualizar el último acceso
         const comenzarBtn = cursoDiv.querySelector('.comenzar-curso-btn');
         comenzarBtn.addEventListener('click', async (event) => {

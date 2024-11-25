@@ -134,7 +134,25 @@ class NivelClass{
         }
     }
 
-
+    static function obtenerNivelesSimplificados($id) {
+        self::inicializarConexion();
+        $sql = "CALL obtener_niveles_simplificados(:id)";
+        $sentencia = self::$conexion->prepare($sql);
+        $sentencia->execute(['id' => $id]);
+    
+        $niveles = $sentencia->fetchAll(PDO::FETCH_ASSOC);
+        
+    // Depuración
+    error_log("Niveles obtenidos: " . print_r($niveles, true));
+    
+        if (!$niveles) {
+            return null;
+        } else {
+            return $niveles;
+        }
+    }
+    
+    
 
 }
 ?>

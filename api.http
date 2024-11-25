@@ -1,0 +1,50 @@
+###recuperar total de gastado o ingresado
+  http://localhost/aprendi/api/cursoController.php?pagina=1
+
+###recuperar transacciones por tipo o todas[ingreso,gasto, mixed (todas)]
+http://localhost/aprendi/api/nivelesController.php?curso_id=1
+
+###recuperar transacciones por tipo o todas[ingreso,gasto, mixed (todas)]
+http://localhost/aprendi/api/nivelesController.php/?id=1&nivel=1
+
+### Recuperar total ahorradocon id de usuario
+GET http://localhost/aprendi/api/inscripcionesController.php?id=3
+
+### Recuperar una transaccion especifico con id
+GET http://localhost:1234/transacciones/67305ec92d064f7a9bd5fdcf
+
+### Recuperar una película por id
+GET http://localhost:1234/usuarios/67301d67c4e28e2952f30712
+
+### Borrado logico una película por id
+DELETE http://localhost:1234/transacciones/6730e884d2a7e5bdc91a51bd
+
+### Recuperar todas las películas por un género
+GET http://localhost:1234/usuarios
+
+### Crear una película con POST
+POST http://localhost:1234/transacciones
+Content-Type: application/json
+
+{
+  "usuario_id": "67301d67c4e28e2952f30712",
+  "monto": 1005,
+  "tipo": "ingreso",
+  "descripcion": "asdasd"
+}
+
+### Actualizar una película
+PATCH http://localhost:1234/transacciones/6730593dff92c853a5b06859
+Content-Type: application/json
+
+{
+  "monto": 1
+}
+
+### lastest transac
+POST http://localhost:1234/transacciones/last
+Content-Type: application/json
+
+{
+  "id": "67301d67c4e28e2952f30712"
+}

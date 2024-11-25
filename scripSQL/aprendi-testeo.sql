@@ -18,6 +18,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 SET FOREIGN_KEY_CHECKS = 0;
 TRUNCATE TABLE Cursos;
 SET FOREIGN_KEY_CHECKS = 1;
+SHOW VARIABLES LIKE 'max_allowed_packet';
 
 CREATE TABLE IF NOT EXISTS Usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY COMMENT 'Identificador único del usuario',
@@ -698,13 +699,16 @@ END//
 DELIMITER ;
 
 DELIMITER //
-
+DELIMITER ;
+drop procedure ObtenerUltimoIDPorInstructor;
+DELIMITER ;
+DELIMITER //
 CREATE PROCEDURE ObtenerUltimoIDPorInstructor(
     IN p_instructor_id INT
 )
 BEGIN
     -- Obtener el mayor ID para el instructor especificado
-    SELECT id
+    SELECT id, titulo
     FROM Cursos
     WHERE instructor_id = p_instructor_id
     order by id desc limit 1;

@@ -20,6 +20,7 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     $correo = $usuarioDatos['correo'];
     $rol = $usuarioDatos['rol'];
 }
+error_log("Este es un mensaje de prueba para confirmar los logs.");
 
 ?>
 <!DOCTYPE html>
@@ -43,25 +44,21 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
         position: relative;
         padding: 20px; /* Espaciado interno */
         height: 400px; /* Ajustar altura según sea necesario */
-        background-image: url('Imagenes/It&Software(curso).jpg'); /* Imagen de fondo */
         background-size: cover; /* Cubrir todo el área */
         background-position: center; /* Centrar la imagen */
         border-radius: 8px; /* Bordes redondeados */
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Sombra para dar profundidad */
         overflow: hidden; /* Ocultar contenido que se desborda */
     }
-    .video-container {
-        position: absolute; /* Posicionar el video de manera absoluta */
-        top: 50%; /* Centrar verticalmente */
-        left: 35%; /* Centrar horizontalmente */
-        transform: translate(-50%, -50%); /* Ajustar el centrado */
-        transition: transform 0.5s ease; /* Transición para el efecto de movimiento */
+    .video-container img {
+    width: 100%; /* Ocupa el 100% del ancho del contenedor */
+    height: 300px; /* Fija una altura consistente */
+    object-fit: cover; /* Recorta y ajusta la imagen para llenar el área */
+    object-position: center; /* Centra la imagen dentro del contenedor */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Agrega una sombra */
     }
-    .video-container video {
-        width: 225%;
-        height: 225%;
-        border-radius: 8px; /* Bordes redondeados para el video */
-    }
+
     .thumbnail-container {
         display: flex;
         justify-content: center; /* Centrar miniaturas */
@@ -198,11 +195,12 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
         <div class="niveles mt-4"></div>
 
         <div class="video-section">
+            <!-- La imagen del curso se cargará aquí dinámicamente -->
             <div id="videoContainer" class="video-container">
-                <img id="imgcurso" class="imgcurso">
-                </img>
+                <img src="" alt="Imagen del curso" class="img-fluid rounded" style="max-width: 100%; height: auto;">
             </div>
         </div>
+
 
         <div class="comprar-curso mt-4">
             <h4>Comprar Curso Completo</h4>
@@ -241,12 +239,12 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     <div id="footer-container"></div>
     <script>
                 const estudianteId = <?php echo json_encode($usuario_id); ?>;
-                const usuarioRol = <?php echo json_encode($rol); ?>;
+                const usuarioRol = <?php echo json_encode($rol); ?>; // "instructor" o "estudiante"
     </script>
-    <script src="../scriptJS/valoracionCurso-val.js"></script>
+    <!-- <script src="../scriptJS/valoracionCurso-val.js"></script> -->
     <script src="../scriptJS/detallesCurso-val.js"></script>
     <script src="../scriptJS/inscribirCurso-val.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script> -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetch('../partials/menu.php')

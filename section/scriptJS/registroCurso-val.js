@@ -190,6 +190,9 @@ function enviarFormularioCurso(usuarioId, imagenBase64) {
 
             // Actualizar el combo box con el último curso registrado
             mostrarComboBoxCursos(usuarioId);
+            const cantidadNiveles = document.getElementById('cantidad_niveles').value;
+            generarInputsNiveles(cantidadNiveles);
+            
         } else {
             throw new Error(`Error del servidor: ${data.message || 'Sin mensaje de error'}`);
         }
@@ -201,49 +204,43 @@ function enviarFormularioCurso(usuarioId, imagenBase64) {
 }
 
 function mostrarComboBoxCursos(usuarioId) {
-    fetch(`http://localhost/aprendi/api/cursoController.php?id=${usuarioId}&pagina=1`, {
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
+    // Hacer una solicitud POST al nuevo endpoint para obtener el último curso
+    fetch('http://localhost/aprendi/api/ultimoIDCurso.php', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: usuarioId })
     })
     .then(response => {
         if (!response.ok) {
-            throw new Error('Error al obtener los cursos del instructor');
+            throw new Error('Error al obtener el último curso del instructor');
         }
-        return response.text(); // Leer la respuesta como texto primero
+        return response.json();
     })
-    .then(responseText => {
-        console.log('Respuesta cruda de la API:', responseText);
-
-        if (!responseText) {
-            throw new Error('La respuesta está vacía');
-        }
-
-        // Intentar convertir la respuesta a JSON
-        const cursos = JSON.parse(responseText);
-
-        if (Array.isArray(cursos) && cursos.length > 0) {
-            console.log('Cursos obtenidos:', cursos);
-            const ultimoCurso = cursos[0];
+    .then(data => {
+        if (Array.isArray(data) && data.length > 0) {
+            const curso = data[0]; // Obtenemos el curso
+            console.log('Último curso obtenido:', curso);
+        
             const cursosSelect = document.getElementById('cursosSelect');
-            cursosSelect.innerHTML = ''; // Limpiar el combobox
-
+            cursosSelect.innerHTML = ''; // Limpiamos el combobox
+        
             const option = document.createElement('option');
-            option.value = ultimoCurso.id;
-            option.textContent = ultimoCurso.titulo;
+            option.value = curso.id;
+            option.textContent = curso.titulo; // Mostramos el título
             cursosSelect.appendChild(option);
-
+        
             cursosSelect.disabled = true;
-
+        
+            // Mostrar el formulario de niveles
             document.getElementById('nivelesForm').style.display = 'block';
-            generarInputsNiveles(parseInt(document.getElementById('cantidad_niveles').value, 10));
-        } else {
-            console.warn('No se encontraron cursos para este instructor.');
         }
+        
     })
     .catch(error => {
-        console.error('Error al obtener los cursos:', error);
+        console.error('Error al obtener el último curso:', error);
     });
 }
+
 
 
 function obtenerCursoMasReciente(cursos) {
@@ -279,8 +276,8 @@ function generarInputsNiveles(cantidadNiveles) {
                 </h2>
                 <div id="collapse${i}" class="accordion-collapse collapse">
                     <div class="accordion-body">
-                        <label for="nivel_${i}_url" class="form-label">URL del Video:</label>
-                        <input type="text" id="nivel_${i}_url" class="form-control nivel-url" placeholder="https://example.com/video${i}">
+                        <label for="nivel_${i}_video">Subir video para Nivel ${i}:</label>
+                        <input type="file" id="nivel_${i}_video" class="form-control" accept="video/*">
                         <small class="error-message" id="error-url-${i}" style="color:red; margin-bottom:15px;"></small>
                         <br>
                         <br>
@@ -296,7 +293,7 @@ function generarInputsNiveles(cantidadNiveles) {
 
 
 async function registrarNiveles() {
-    const nivelesUrls = document.querySelectorAll('.nivel-url');
+    const nivelesVideos = document.querySelectorAll('.nivel-input input[type="file"]');
     const nivelesDescripciones = document.querySelectorAll('.nivel-descripcion');
     const cursoId = document.getElementById('cursosSelect').value;
 
@@ -304,17 +301,20 @@ async function registrarNiveles() {
     const nivelesData = [];
 
     // Validar todos los niveles
-    for (let index = 0; index < nivelesUrls.length; index++) {
-        const urlInput = nivelesUrls[index];
+    for (let index = 0; index < nivelesVideos.length; index++) {
+        const videoInput = nivelesVideos[index];
         const descripcionInput = nivelesDescripciones[index];
-        const urlError = document.getElementById(`error-url-${index + 1}`);
+        const videoError = document.getElementById(`error-url-${index + 1}`);
         const descripcionError = document.getElementById(`error-descripcion-${index + 1}`);
 
-        if (!urlInput.value.trim() || /^[^a-zA-Z0-9]*$/.test(urlInput.value)) {
-            urlError.textContent = 'La URL no puede estar vacía ni contener solo símbolos.';
+        if (!videoInput.files[0]) {
+            videoError.textContent = 'Debes seleccionar un archivo de video.';
+            valid = false;
+        } else if (videoInput.files[0].size > 50 * 1024 * 1024) { // Límite de 50 MB
+            videoError.textContent = 'El archivo no puede superar los 50 MB.';
             valid = false;
         } else {
-            urlError.textContent = '';
+            videoError.textContent = '';
         }
 
         if (!descripcionInput.value.trim() || /^[^a-zA-Z0-9]*$/.test(descripcionInput.value)) {
@@ -325,10 +325,13 @@ async function registrarNiveles() {
         }
 
         if (valid) {
+            // Convertir el video a Base64
+            const videoBase64 = await convertirArchivoABase64(videoInput.files[0]);
+
             nivelesData.push({
                 curso_id: cursoId,
                 nivel: index + 1,
-                url_video: urlInput.value.trim(),
+                url_video: videoBase64,
                 descripcion: descripcionInput.value.trim()
             });
         }
@@ -375,4 +378,12 @@ async function registrarNiveles() {
     }
 }
 
+function convertirArchivoABase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result); // Base64 del archivo
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
 

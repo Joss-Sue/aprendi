@@ -56,10 +56,19 @@ function obtenerProgreso(cursoId) {
 
 function obtenerTotalNiveles(cursoId) {
     fetch(`http://localhost/aprendi/api/nivelesController.php?curso_id=${cursoId}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`Error en la API: ${response.status} - ${response.statusText}`);
+            }
+            return response.json();
+        })
         .then(niveles => {
-            totalNiveles = niveles.length;
-            console.log("Total de niveles:", totalNiveles);
+            if (niveles && Array.isArray(niveles)) {
+                totalNiveles = niveles.length;
+                console.log("Total de niveles:", totalNiveles);
+            } else {
+                console.error("Error: Respuesta inválida para niveles:", niveles);
+            }
         })
         .catch(error => {
             console.error("Error al obtener los niveles:", error);
@@ -106,55 +115,33 @@ async function cargarNiveles(cursoId) {
     const nivelesContainer = document.getElementById('nivelesContainer');
     nivelesContainer.innerHTML = '';
 
-    // Obtener los niveles del curso
-    const response = await fetch(`http://localhost/aprendi/api/nivelesController.php?curso_id=${cursoId}`);
-    const niveles = await response.json();
+    try {
+        const response = await fetch(`http://localhost/aprendi/api/nivelesController.php?curso_id=${cursoId}`);
+        if (!response.ok) {
+            throw new Error(`Error al obtener los niveles: ${response.status} - ${response.statusText}`);
+        }
+        const niveles = await response.json();
 
-    if (!niveles || niveles.length === 0) {
-        nivelesContainer.innerHTML = '<p>No hay niveles disponibles.</p>';
-        return;
-    }
-
-    // Obtener los niveles completados por el usuario
-    const nivelesCompletados = await obtenerNivelesCompletados(cursoId, estudianteId);
-    const completadosSet = new Set(nivelesCompletados);
-
-    niveles.forEach(nivel => {
-        const nivelItem = document.createElement('div');
-        nivelItem.classList.add('nivel-card');
-
-        const nivelTitulo = document.createElement('h5');
-        nivelTitulo.textContent = `Nivel ${nivel.nivel}: ${nivel.descripcion}`;
-        nivelItem.appendChild(nivelTitulo);
-
-        const nivelDescripcion = document.createElement('p');
-        nivelDescripcion.textContent = nivel.descripcion || 'Sin descripción';
-        nivelItem.appendChild(nivelDescripcion);
-
-        const completarBtn = document.createElement('button');
-        completarBtn.textContent = 'Completar Nivel';
-        completarBtn.classList.add('btn', 'btn-green');
-        completarBtn.setAttribute('data-nivel-id', nivel.nivel);
-
-        // Si el nivel ya está completado, deshabilitar el botón
-        if (completadosSet.has(nivel.nivel)) {
-            completarBtn.disabled = true;
-            completarBtn.textContent = 'Nivel Completado';
+        if (!niveles || niveles.length === 0) {
+            nivelesContainer.innerHTML = '<p>No hay niveles disponibles.</p>';
+            return;
         }
 
-        completarBtn.addEventListener('click', async function () {
-            await completarNivel(cursoId, nivel.nivel, completarBtn);
-        });
+        // Mostrar niveles
+        niveles.forEach(nivel => {
+            const nivelItem = document.createElement('div');
+            nivelItem.classList.add('nivel-card');
 
-                // Añadir evento para cargar el video del nivel al hacer clic en el título
-        nivelItem.addEventListener('click', function () {
-            console.log(`Cargando video para el nivel ${nivel.nivel}`);
-            cargarVideo(nivel);
-        });
+            const nivelTitulo = document.createElement('h5');
+            nivelTitulo.textContent = `Nivel ${nivel.nivel}: ${nivel.descripcion}`;
+            nivelItem.appendChild(nivelTitulo);
 
-        nivelItem.appendChild(completarBtn);
-        nivelesContainer.appendChild(nivelItem);
-    });
+            nivelesContainer.appendChild(nivelItem);
+        });
+    } catch (error) {
+        console.error("Error al cargar niveles:", error);
+        nivelesContainer.innerHTML = '<p>Error al cargar los niveles.</p>';
+    }
 }
 function transformarUrlYoutube(url) {
     if (url.includes("watch?v=")) {

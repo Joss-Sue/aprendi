@@ -110,8 +110,7 @@ BEGIN
     SELECT * 
     FROM cursos
     WHERE instructor_id = p_instructor_id
-    ORDER BY fecha_creacion DESC
-    LIMIT 20 OFFSET p_pagina;
+    ORDER BY fecha_creacion DESC;
 END //
 
 DELIMITER ;
@@ -153,20 +152,26 @@ DELIMITER ;
 CALL buscar_all_cursos(0);
 
 DELIMITER //
-
+DELIMITER //
+DELIMITER ;
+drop procedure buscar_curso_id;
+DELIMITER ;
+DELIMITER //
 -- existe?
 CREATE PROCEDURE buscar_curso_id(
     IN p_id INT
 )
 BEGIN
-    SELECT * 
+    SELECT id, titulo, descripcion, costo, imagen 
     FROM cursos
     WHERE id = p_id 
       AND estado = 1;
 END //
 
 DELIMITER ;
+CALL buscar_curso_id(1);
 
+DELIMITER ;
 CALL buscar_curso_id(2);
 
 DELIMITER //
@@ -242,7 +247,28 @@ END //
 DELIMITER ;
 
 CALL buscar_all_niveles(1);
+DELIMITER ;
+DELIMITER //
+DELIMITER ;
+drop procedure obtener_niveles_nombre_descripcion;
+DELIMITER ;
+DELIMITER //
+DELIMITER ;
+CALL obtener_niveles_simplificados(1);
+DELIMITER ;
+DELIMITER //
+CREATE PROCEDURE obtener_niveles_simplificados(
+    IN p_curso_id INT
+)
+BEGIN
+    SELECT nivel, descripcion
+    FROM niveles
+    WHERE curso_id = p_curso_id
+      AND estado = 1
+    ORDER BY nivel ASC;
+END//
 
+DELIMITER ;
 drop procedure buscar_nivel_id;
 DELIMITER //
 

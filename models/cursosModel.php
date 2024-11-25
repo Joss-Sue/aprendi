@@ -92,23 +92,24 @@ class CursoClass{
                            
     }
 
-    static function buscarCursoByID($id){
-        
+    static function buscarCursoByID($id) {
         self::inicializarConexion();
-        $sql="CALL buscar_curso_id( :id )";
-        $sentencia = self::$conexion-> prepare($sql);
-        $sentencia -> execute(['id'=>$id]);
+        $sql = "CALL buscar_curso_id( :id )";
+        $sentencia = self::$conexion->prepare($sql);
+        $sentencia->execute(['id' => $id]);
     
         $producto = $sentencia->fetch(PDO::FETCH_ASSOC);
-        $usuario['imagen'] = 'data:image/png;base64,' . base64_encode($producto['imagen']);
-        
     
-        if(!$producto) {
-           return null;
-        }else{
+        if (!$producto) {
+            return null;
+        } else {
+            if (!empty($producto['imagen'])) {
+                $producto['imagen'] = 'data:image/png;base64,' . base64_encode($producto['imagen']);
+            }
             return $producto;
         }
     }
+    
 
     /*static function contarFilas($tipo){
         

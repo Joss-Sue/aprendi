@@ -65,22 +65,23 @@ class InscripcionesClass{
     }
 
     static function buscarInscripcionByID($curso_id, $estudiante_id){
-        
         self::inicializarConexion();
-        $sql="CALL buscar_inscripcion_id(:curso_id, :estudiante_id";
-        $sentencia = self::$conexion-> prepare($sql);
-        $sentencia -> execute(['curso_id'=>$curso_id,
-        'estudiante_id'=>$estudiante_id]);
+        $sql = "CALL buscar_inscripcion_id(:curso_id, :estudiante_id)"; // Cerrando correctamente la instrucción
+        $sentencia = self::$conexion->prepare($sql);
+        $sentencia->execute([
+            'curso_id' => $curso_id,
+            'estudiante_id' => $estudiante_id
+        ]);
     
         $inscripcion = $sentencia->fetch(PDO::FETCH_ASSOC);
-        
     
-        if(!$inscripcion) {
-           return null;
-        }else{
+        if (!$inscripcion) {
+            return null;
+        } else {
             return $inscripcion;
         }
     }
+    
 
     static function buscarAllInscripciones($id){
         

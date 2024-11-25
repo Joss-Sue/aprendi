@@ -5,17 +5,7 @@ session_start();
 switch ($_SERVER['REQUEST_METHOD']) {
     case 'GET':
         {
-            //http://localhost/aprendi/api/nivelesController.php/?id_curso=1 --niveles por curso (ver niveles)
-            if (isset($_GET['curso_id'])) {
-                $nivelRespuesta = NivelClass::buscarAllNiveles($_GET['curso_id']);
-                if($nivelRespuesta==null){
-                    http_response_code(400);
-                    echo json_encode(array("status" => "error", "message" => "ningun usuario encontrado"));
-                }else{
-                    http_response_code(200);
-                    echo json_encode($nivelRespuesta);
-                }exit;
-            } elseif (isset($_GET['id'])){
+            if (isset($_GET['id']) && isset($_GET['nivel'])){
                 //http://localhost/aprendi/api/nivelesController.php/?id=1&nivel=1 --curso id y nivel (editar nivel)
                     $nivelRespuesta = NivelClass::buscarNivelByID($_GET['id'], $_GET['nivel']);
                     if($nivelRespuesta==null){
@@ -25,6 +15,16 @@ switch ($_SERVER['REQUEST_METHOD']) {
                         http_response_code(200);
                         echo json_encode($nivelRespuesta);
                     }exit;
+                //http://localhost/aprendi/api/nivelesController.php/?id_curso=1 --niveles por curso (ver niveles)
+                }elseif (isset($_GET['curso_id'])) {
+                $nivelRespuesta = NivelClass::buscarAllNiveles($_GET['curso_id']);
+                if($nivelRespuesta==null){
+                    http_response_code(400);
+                    echo json_encode(array("status" => "error", "message" => "ningun usuario encontrado"));
+                }else{
+                    http_response_code(200);
+                    echo json_encode($nivelRespuesta);
+                }exit;
             }else{
                 http_response_code(400);
             }
