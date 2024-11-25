@@ -98,7 +98,10 @@ CALL buscar_all_categorias();
 -- sp cursos
 
 DELIMITER //
-
+DELIMITER ;
+DROP PROCEDURE IF EXISTS buscar_cursos_instructor;
+DELIMITER ;
+DELIMITER //
 CREATE PROCEDURE buscar_cursos_instructor(
     IN p_instructor_id INT,
     IN p_pagina INT

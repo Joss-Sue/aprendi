@@ -428,7 +428,7 @@ BEGIN
     WHERE id = p_id;
 END //
 DELIMITER //
-
+DELIMITER ;
 DROP PROCEDURE IF EXISTS InsertarUsuario;
 DELIMITER //
 
@@ -499,6 +499,7 @@ DELIMITER ;
 DELIMITER //
 
 DROP VIEW IF EXISTS reporteAdminInstructores;
+DELIMITER ;
 CREATE VIEW reporteAdminInstructores
 AS
 SELECT 
@@ -516,9 +517,9 @@ WHERE
     AND u.estado = 1
 GROUP BY 
     u.id;
-    
+DELIMITER ;
 DELIMITER //
-
+DELIMITER ;
 CREATE VIEW reporteAdminEstudiantes AS
 SELECT 
     u.correo AS usuario,
@@ -535,6 +536,7 @@ WHERE
     AND u.estado = 1
 GROUP BY 
     u.id;
+    DELIMITER ;
 DELIMITER //
 
 CREATE PROCEDURE ObtenerMensajesConUsuarios(
