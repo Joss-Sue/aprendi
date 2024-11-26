@@ -109,30 +109,30 @@ class NivelClass{
         }
     }
 
-    static function buscarAllNiveles($id){
-        
-        self::inicializarConexion();
-        $sql="CALL buscar_all_niveles(:id)";
-        $sentencia = self::$conexion-> prepare($sql);
-        $sentencia -> execute(['id'=>$id]);
-        
+    static function buscarAllNiveles($id) {
+        try {
+            self::inicializarConexion();
+            $sql = "CALL buscar_all_niveles(:id)";
+            $sentencia = self::$conexion->prepare($sql);
+            $sentencia->execute(['id' => $id]);
+            
+            $cursos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     
-        $cursos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
-
-        if ($cursos) {
-            foreach ($cursos as &$cursos) {
-                if (isset($cursos['url_video'])) {
-                    $cursos['url_video'] = 'data:video/mp4;base64,' . base64_encode($cursos['url_video']);
+            if ($cursos) {
+                foreach ($cursos as &$curso) {
+                    if (isset($curso['url_video'])) {
+                        $curso['url_video'] = 'data:video/mp4;base64,' . base64_encode($curso['url_video']);
+                    }
                 }
             }
-        }
     
-        if(!$cursos) {
-           return null;
-        }else{
-            return $cursos;
+            return $cursos ?: null; // Retorna $cursos si existe, de lo contrario null.
+        } catch (PDOException $e) {
+            error_log("Error en buscarAllNiveles: " . $e->getMessage());
+            return null;
         }
     }
+    
 
     static function obtenerNivelesSimplificados($id) {
         self::inicializarConexion();
