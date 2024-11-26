@@ -47,7 +47,7 @@ class NivelClass{
            return array(false,"error en id");
         }
         try{
-            $sqlUpdate="update niveles set nivel= :nivel, descripcion = :descripcion, url_video = :url_video where curso_id = :curso_id and nivel = :nivel;";
+            $sqlUpdate="CALL editar_nivel(:curso_id, :nivel, :descripcion, :url_video";
             $consultaInsert = self::$conexion-> prepare($sqlUpdate);
 
             $consultaInsert->bindValue(':curso_id', $curso_id, PDO::PARAM_INT);

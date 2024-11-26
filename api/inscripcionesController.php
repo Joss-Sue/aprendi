@@ -43,8 +43,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
     case 'POST':
         {
 
-            //http://localhost/aprendi/api/inscripcionesController.php
-            //{"curso_id": 1, "estudiante_id": 2, "precio_pagado": 199.99, "tipo_pago": "tarjeta"}
+            //http://localhost/aprendi/api/inscripcionesController.php/
+            //{"curso_id": 3, "estudiante_id":1, "precio_pagado":"299.99", "tipo_pago":"tarjeta"}
 
             $data = json_decode(file_get_contents('php://input'), true);
 

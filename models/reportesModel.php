@@ -88,7 +88,7 @@ class ReporteClass{
     static function obtenerReporteAdminEstudiantes(){
         
         self::inicializarConexion();
-        $sql= "select * from reporteAdminEstudiantes;";
+        $sql= "CALL obtener_reporte_admin_estudiantes();";
         $sentencia = self::$conexion-> prepare($sql);
         $sentencia -> execute();
     

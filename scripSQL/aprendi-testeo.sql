@@ -715,3 +715,114 @@ BEGIN
 END//
 
 DELIMITER ;
+
+-- 26/11/2024
+
+Alter VIEW cursos_mas_vendidos
+AS
+SELECT 
+    c.id AS curso_id,
+    c.titulo,
+    c.descripcion,
+    c.costo,
+    c.fecha_creacion,
+    COUNT(i.estudiante_id) AS total_inscripciones,
+    c.imagen
+FROM 
+    Cursos c
+LEFT JOIN 
+    Inscripciones i ON c.id = i.curso_id
+WHERE 
+    c.estado = 1 
+GROUP BY 
+    c.id
+ORDER BY 
+    total_inscripciones DESC
+LIMIT 5; 
+
+alter VIEW cursos_mas_recientes
+AS
+  SELECT 
+    id AS curso_id,
+    titulo,
+    descripcion,
+    costo,
+    fecha_creacion,
+    imagen
+FROM 
+    Cursos
+WHERE 
+    estado = 1
+ORDER BY 
+    fecha_creacion DESC 
+LIMIT 5;
+
+ALTER VIEW cursos_mejor_calificados
+AS
+SELECT 
+    c.id AS curso_id,
+    c.titulo,
+    c.descripcion,
+    c.costo,
+    COALESCE(AVG(com.calificacion), 0) AS promedio_calificacion,
+    fecha_creacion,
+    imagen
+FROM 
+    Cursos c
+LEFT JOIN 
+    Comentarios com ON c.id = com.curso_id AND com.estado = 1 
+WHERE 
+    c.estado = 1 
+GROUP BY 
+    c.id
+ORDER BY 
+    promedio_calificacion DESC 
+LIMIT 5; 
+
+CREATE VIEW reporteAdminEstudiantes AS
+SELECT 
+    u.nombre,
+    u.fecha_registro,
+    COUNT(DISTINCT i.curso_id) cursos_inscritos,
+    SUM(CASE 
+        WHEN i.progreso_curso = 100 THEN 1
+        ELSE 0
+    END) AS cursos_terminados
+FROM 
+    Usuarios u
+LEFT JOIN 
+    Inscripciones i ON u.id = i.estudiante_id
+WHERE 
+    u.rol = 'estudiante'
+GROUP BY 
+    u.id, u.nombre, u.fecha_registro
+ORDER BY 
+    u.nombre;
+
+    DELIMITER //
+
+CREATE PROCEDURE obtener_reporte_admin_estudiantes()
+BEGIN
+    SELECT * FROM reporteAdminEstudiantes;
+END //
+
+DELIMITER ;
+
+drop procedure editar_nivel;
+DELIMITER //
+CREATE PROCEDURE editar_nivel(
+    IN p_curso_id INT,
+    IN p_nivel INT,
+    IN p_descripcion TEXT,
+    IN p_url_video longblob
+)
+BEGIN
+    UPDATE niveles
+    SET 
+        descripcion = p_descripcion, 
+        url_video = p_url_video
+    WHERE curso_id = p_curso_id 
+      AND nivel = p_nivel;
+END //
+
+DELIMITER ;
