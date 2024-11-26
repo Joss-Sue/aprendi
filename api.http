@@ -6,9 +6,10 @@ http://localhost/aprendi/api/nivelesController.php?curso_id=1
 
 ###recuperar transacciones por tipo o todas[ingreso,gasto, mixed (todas)]
 http://localhost/aprendi/api/nivelesController.php/?id=1&nivel=1
-
+###recuperar transacciones por tipo o todas[ingreso,gasto, mixed (todas)]
+http://localhost/aprendi/api/cursoController.php?pagina=1&id=2
 ### Recuperar total ahorradocon id de usuario
-GET http://localhost/aprendi/api/inscripcionesController.php?id=3
+GET http://localhost/aprendi/api/nivelesController.php?curso_id=1
 
 ### Recuperar una transaccion especifico con id
 GET http://localhost:1234/transacciones/67305ec92d064f7a9bd5fdcf

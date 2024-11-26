@@ -87,91 +87,95 @@ async function aplicarFiltro() {
     const soloCompletados = document.getElementById('completedCourses').checked;
     const soloActivos = document.getElementById('activeCourses').checked;
 
-    const fechaInicioDate = fechaInicio ? new Date(fechaInicio) : null;
-    const fechaFinDate = fechaFin ? new Date(fechaFin) : null;
-
     const kardexContainer = document.getElementById('kardexContainer');
     kardexContainer.innerHTML = '';
-
+    console.log("Filtro - Categoría seleccionada:", categoriaId);
+    console.log("Filtro - Fecha inicio:", fechaInicio);
+    console.log("Filtro - Fecha fin:", fechaFin);
     for (let curso of cursosCargados) {
-        // Obtener detalles del curso
-        const cursoId = curso.curso_id;
-        const urlCurso = `http://localhost/aprendi/api/cursoController.php?id=${cursoId}`;
-        const urlProgreso = `http://localhost/aprendi/api/inscripcionesController.php?curso_id=${cursoId}&estudiante_id=${estudianteId}`;
+        try {
+            // Obtener detalles del curso
+            const cursoId = curso.curso_id;
+            const urlCurso = `http://localhost/aprendi/api/cursoController.php?id=${cursoId}`;
+            const urlProgreso = `http://localhost/aprendi/api/inscripcionesController.php?curso_id=${cursoId}&estudiante_id=${estudianteId}`;
 
-        const [cursoDetallesResponse, progresoResponse] = await Promise.all([
-            fetch(urlCurso),
-            fetch(urlProgreso)
-        ]);
+            const [cursoDetallesResponse, progresoResponse] = await Promise.all([
+                fetch(urlCurso),
+                fetch(urlProgreso)
+            ]);
 
-        if (!cursoDetallesResponse.ok || !progresoResponse.ok) {
-            console.error(`Error al obtener detalles o progreso para el curso con ID: ${cursoId}`);
-            continue;
-        }
-
-        const cursoDetalles = await cursoDetallesResponse.json();
-        const progresoData = await progresoResponse.json();
-
-        const nombreCurso = cursoDetalles.titulo || 'Curso sin nombre';
-        const progreso = progresoData && progresoData.progreso_curso ? parseFloat(progresoData.progreso_curso) : 0;
-
-        let mostrarCurso = true;
-
-        // Filtrar por categoría
-        if (categoriaId && cursoDetalles.categoria_id != categoriaId) {
-            mostrarCurso = false;
-        }
-
-        // Filtrar por fechas de inscripción
-        if (fechaInicio) {
-            const fechaInicioDate = new Date(fechaInicio);
-            fechaInicioDate.setHours(0, 0, 0, 0); 
-
-            const fechaInscripcion = new Date(curso.fecha_inscripcion);
-            fechaInscripcion.setHours(0, 0, 0, 0); 
-
-            if (fechaInscripcion.getTime() < fechaInicioDate.getTime()) {
-                mostrarCurso = false; 
+            if (!cursoDetallesResponse.ok || !progresoResponse.ok) {
+                console.error(`Error al obtener detalles o progreso para el curso con ID: ${cursoId}`);
+                continue;
             }
-        }
 
-        if (fechaFin) {
-            const fechaFinDate = new Date(fechaFin);
-            fechaFinDate.setHours(24, 59, 59, 999); 
+            const cursoDetalles = await cursoDetallesResponse.json();
+            const progresoData = await progresoResponse.json();
+            const nombreCurso = cursoDetalles.titulo || 'Curso sin nombre';
+            const progreso = progresoData && progresoData.progreso_curso ? parseFloat(progresoData.progreso_curso) : 0;
 
-            const fechaInscripcion = new Date(curso.fecha_inscripcion);
-            fechaInscripcion.setHours(0, 0, 0, 0); 
+            let mostrarCurso = true;
 
-            if (fechaInscripcion.getTime() > fechaFinDate.getTime()) {
-                mostrarCurso = false; 
+            // Filtrar por categoría
+            if (categoriaId && cursoDetalles.categoria_id != categoriaId) {
+                mostrarCurso = false; // Ocultar cursos que no coincidan con la categoría
+                console.log(`Curso ${nombreCurso} filtrado por categoría. No pertenece a la categoría ${categoriaId}`);
             }
-        }
 
-        // Filtrar solo cursos completados o solo activos
-        if (soloCompletados && progreso < 100) {
-            mostrarCurso = false;
-        }
+            // Filtrar por fechas de inscripción
+            if (fechaInicio) {
+                const fechaInicioDate = new Date(fechaInicio);
+                fechaInicioDate.setHours(0, 0, 0, 0); 
 
-        if (soloActivos && progreso === 100) {
-            mostrarCurso = false;
-        }
+                const fechaInscripcion = new Date(curso.fecha_inscripcion);
+                fechaInscripcion.setHours(0, 0, 0, 0); 
 
-        // Si el curso pasa todos los filtros, agregar la fila al kardex
-        if (mostrarCurso) {
-            const row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${nombreCurso}</td>
-                <td>${progreso}%</td>
-                <td>${curso.fecha_inscripcion}</td>
-                <td>${curso.fecha_ultima || '-'}</td>
-                <td>${progreso === 100 ? curso.fecha_terminacion : '-'}</td>
-                <td>${progreso === 100 ? 'Completo' : 'Incompleto'}</td>
-                <td>${progreso === 100 ? '<button class="btn btn-green" id="valorar" onclick="descargarCertificado(' + cursoId + ', ' + estudianteId + ')">Descargar</button>' : '-'}</td>
-            `;
-            kardexContainer.appendChild(row);
+                if (fechaInscripcion.getTime() < fechaInicioDate.getTime()) {
+                    mostrarCurso = false; 
+                }
+            }
+
+            if (fechaFin) {
+                const fechaFinDate = new Date(fechaFin);
+                fechaFinDate.setHours(24, 59, 59, 999); 
+
+                const fechaInscripcion = new Date(curso.fecha_inscripcion);
+                fechaInscripcion.setHours(0, 0, 0, 0); 
+
+                if (fechaInscripcion.getTime() > fechaFinDate.getTime()) {
+                    mostrarCurso = false; 
+                }
+            }
+
+            // Filtrar solo cursos completados o solo activos
+            if (soloCompletados && progreso < 100) {
+                mostrarCurso = false;
+            }
+
+            if (soloActivos && progreso === 100) {
+                mostrarCurso = false;
+            }
+
+            // Si el curso pasa todos los filtros, agregar la fila al kardex
+            if (mostrarCurso) {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${nombreCurso}</td>
+                    <td>${progreso}%</td>
+                    <td>${curso.fecha_inscripcion}</td>
+                    <td>${curso.fecha_ultima || '-'}</td>
+                    <td>${progreso === 100 ? curso.fecha_terminacion : '-'}</td>
+                    <td>${progreso === 100 ? 'Completo' : 'Incompleto'}</td>
+                    <td>${progreso === 100 ? '<button class="btn btn-green" id="valorar" onclick="descargarCertificado(' + cursoId + ', ' + estudianteId + ')">Descargar</button>' : '-'}</td>
+                `;
+                kardexContainer.appendChild(row);
+            }
+        } catch (error) {
+            console.error("Error al procesar curso para el kardex:", error);
         }
     }
 }
+
 
 async function descargarCertificado(cursoId, estudianteId) {
     try {

@@ -107,16 +107,21 @@ CREATE PROCEDURE buscar_cursos_instructor(
     IN p_pagina INT
 )
 BEGIN
+    DECLARE offset_value INT;
+    SET offset_value = p_pagina;
+
     SELECT * 
     FROM cursos
     WHERE instructor_id = p_instructor_id
-    ORDER BY fecha_creacion DESC;
+    ORDER BY fecha_creacion DESC
+    LIMIT 20 OFFSET offset_value;
 END //
 
 DELIMITER ;
-
+DELIMITER //
+DELIMITER ;
 CALL buscar_cursos_instructor(2, 0);
-
+DELIMITER ;
 DELIMITER //
 
 CREATE PROCEDURE buscar_por_categoria(
@@ -131,9 +136,9 @@ BEGIN
     ORDER BY fecha_creacion DESC
     LIMIT 20 OFFSET p_pagina;
 END //
-
+DELIMITER ;
 CALL buscar_por_categoria(2, 0);
-
+DELIMITER ;
 DELIMITER //
 
 CREATE PROCEDURE buscar_all_cursos(
@@ -162,7 +167,7 @@ CREATE PROCEDURE buscar_curso_id(
     IN p_id INT
 )
 BEGIN
-    SELECT id, titulo, descripcion, costo, imagen 
+    SELECT id, titulo, descripcion, categoria_id, costo, imagen 
     FROM cursos
     WHERE id = p_id 
       AND estado = 1;
@@ -419,7 +424,7 @@ END //
 
 DELIMITER ;
 
-CALL buscar_estudiante_niveles(1, 1);
+CALL buscar_estudiante_niveles(1, 3);
 
 DELIMITER //
 

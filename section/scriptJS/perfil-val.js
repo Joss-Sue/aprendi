@@ -58,11 +58,11 @@ document.addEventListener('DOMContentLoaded', function() {
         const email = document.getElementById('email').value.trim();
         const password = document.getElementById('password').value.trim(); 
         const imagenInput = document.getElementById('avatarInput');
-
+        const avatarImg = document.getElementById('avatar');
         const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
         const passwordPattern = /^(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/;
         const namePattern = /^[a-zA-Z\s]{3,}$/; // Solo letras y al menos 3 caracteres
-
+        let imagenBase64 = null;
         let valid = true;
 
         // Validación del nombre
@@ -85,27 +85,41 @@ document.addEventListener('DOMContentLoaded', function() {
             mostrarMensajeError('error-password', 'La contraseña debe tener al menos 8 caracteres, incluir una mayúscula, un número y un carácter especial.');
             valid = false;
         }
-        // Validación de la imagen
-        if (!imagenInput || imagenInput.files.length === 0) {
-            mostrarMensajeError('error-img', 'Necesitas agregar una imagen.');
-            valid = false;
-        }        
-        // Si todo es válido, enviar el formulario
-        if (valid) {
-            convertirImagenABase64(imagenInput.files[0], function (imagenBase64) {
-                console.log(imagenBase64);
-                enviarFormulario(fullname, email, password, imagenBase64);
+        if (imagenInput.files.length > 0) {
+            // Caso: Se seleccionó una nueva imagen
+            convertirImagenABase64(imagenInput.files[0], function (base64) {
+                if (base64) {
+                    imagenBase64 = base64;
+                    enviarFormulario(fullname, email, password, imagenBase64);
+                } else {
+                    mostrarMensajeError('error-img', 'Error al procesar la nueva imagen.');
+                }
             });
+        } else {
+            // Caso: No se seleccionó una nueva imagen, usar la imagen actual
+            const imagenActualSrc = avatarImg.src;
+            if (!imagenActualSrc || imagenActualSrc.trim() === '') {
+                mostrarMensajeError('error-img', 'Necesitas agregar una imagen.');
+            } else {
+                // Usar la imagen actual (asumimos que el `src` es válido, ya sea URL o base64)
+                enviarFormulario(fullname, email, password, imagenActualSrc);
+            }
         }
     });
 
-    function convertirImagenABase64(file, callback) {
-        const reader = new FileReader();
-        reader.onloadend = function () {
-            callback(reader.result);
-        };
-        reader.readAsDataURL(file);
-    }
+// Función para convertir archivo en base64
+function convertirImagenABase64(file, callback) {
+    const reader = new FileReader();
+    reader.onloadend = function () {
+        callback(reader.result);
+    };
+    reader.onerror = function () {
+        console.error("Error al leer el archivo.");
+        callback(null);
+    };
+    reader.readAsDataURL(file);
+}
+    
 
     // Función para enviar los datos del perfil a la API
     function enviarFormulario(fullname, email, password, imagenBase64) {
@@ -114,9 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
             nombre: fullname,
             correo: email,
             contrasena: password !== '' ? password : undefined, // Enviar la contraseña si no está vacía
-            imagen: imagenBase64
+            imagen: imagenBase64 || null
         };
-    
+    console.log(data);
         fetch('http://localhost/aprendi/api/usuariosController.php', {
             method: 'PUT',
             headers: {

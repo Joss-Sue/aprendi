@@ -1,7 +1,45 @@
+function verificarRegistro(cursoId, estudianteId) {
+    const url = `http://localhost/aprendi/api/inscripcionesController.php?id=${estudianteId}`;
+
+    return fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Error al verificar la inscripción');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Verificar si hay alguna inscripción para el curso especificado
+            return data.some(inscripcion => inscripcion.curso_id == cursoId);
+        })
+        .catch(error => {
+            console.error("Error al verificar el registro:", error);
+            return false; // Si hay error, asumimos que no está inscrito
+        });
+}
 document.addEventListener('DOMContentLoaded', function () {
-    // Obtener el ID del curso desde la URL
-    const urlParams = new URLSearchParams(window.location.search);
-    const cursoId = urlParams.get('id');
+    const cursoId = new URLSearchParams(window.location.search).get('id'); // Obtener curso ID de la URL
+    const comprarButton = document.querySelector('#comprarButton'); // Botón de compra
+    const comprarButtonh = document.querySelector('#comprarhbtn'); // Botón de compra
+    if (cursoId && estudianteId) {
+        verificarRegistro(cursoId, estudianteId)
+            .then(existe => {
+                if (existe) {
+                    if (comprarButton) comprarButton.style.display = 'none'; // Ocultar botón
+                    comprarButtonh.style.display = 'none';
+                } else {
+                    if (comprarButton) comprarButton.style.display = 'block'; // Mostrar botón
+                    comprarButtonh.style.display = 'block';
+                }
+            })
+            .catch(error => {
+                console.error("Error al verificar el registro:", error);
+                if (comprarButton) comprarButton.style.display = 'none'; // Por seguridad, oculta el botón
+            });
+            
+    } else {
+        console.error("No se pudo obtener el cursoId o estudianteId.");
+    }
 
     if (cursoId) {
         // Llamar a la API para obtener los detalles del curso
