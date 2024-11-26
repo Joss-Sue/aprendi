@@ -172,17 +172,21 @@ class UsuarioClass{
     static function buscarTodosLosUsuarios() {
         self::inicializarConexion();
     
-        $sql = "call sp_select_usuarios()"; //WHERE estado = :estado ['estado' => 1]
+        $sql = "CALL sp_select_usuarios()"; // Llama al procedimiento almacenado
         $sentencia = self::$conexion->prepare($sql);
         $sentencia->execute();
     
         $usuarios = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     
-        if (!$usuarios) {
-            return null;
-        } else {
-            return $usuarios;
+        if ($usuarios) {
+            foreach ($usuarios as &$usuario) {
+                if (isset($usuario['foto'])) {
+                    $usuario['foto'] = 'data:image/png;base64,' . base64_encode($usuario['foto']);
+                }
+            }
         }
+    
+        return $usuarios ? : null; // Retorna el arreglo o null si está vacío
     }
 
     static function actualizarEstadoUsuario($id, $estado) {

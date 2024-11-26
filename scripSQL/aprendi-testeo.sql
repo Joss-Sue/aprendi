@@ -352,29 +352,41 @@ DELIMITER ;
 call sp_lista_cursos_reporte (2);
 
 DELIMITER //
-
-CREATE PROCEDURE sp_kardex_estudiantes(IN estudiante_id_param INT)
+DELIMITER ;
+drop procedure sp_kardex_estudiantes;
+DELIMITER //
+CREATE PROCEDURE sp_kardex_estudiantes(
+    IN estudiante_id_param INT,
+    IN categoria_id INT,
+    IN estado_param INT
+)
 BEGIN
     SELECT 
-        c.titulo AS curso_titulo,
-        ca.nombre AS categoria_nombre, 
-        vi.progreso_curso,
-        vi.fecha_inscripcion,
-        vi.fecha_terminacion,
-        vi.fecha_ultima
+        e.nombre AS estudiante_nombre, -- Nombre del alumno
+        vi.fecha_inscripcion,          -- Fecha de inscripción
+        vi.progreso_curso AS nivel_avance, -- Nivel de avance
+        vi.precio_pagado,             -- Precio pagado
+        vi.forma_pago                 -- Forma de pago
     FROM 
         vista_inscripciones vi
+    JOIN 
+        Estudiantes e ON vi.estudiante_id = e.id
     JOIN 
         Cursos c ON vi.curso_id = c.id
     JOIN 
         Categorias ca ON c.categoria_id = ca.id  
-        vi.estudiante_id = estudiante_id_param;
+    WHERE 
+        vi.estudiante_id = estudiante_id_param
+        AND (ca.id = categoria_id OR categoria_id = 0)
+        AND (c.estado = estado_param OR estado_param = 0);
 END //
-
 DELIMITER ;
+CALL sp_kardex_estudiantes(3,0,0);
 
 DELIMITER //
-
+DELIMITER ;
+drop procedure sp_ventas_por_curso;
+DELIMITER //
 CREATE PROCEDURE sp_ventas_por_curso(IN curso_id_param INT)
 BEGIN
     SELECT 
@@ -395,6 +407,7 @@ BEGIN
 END //
 
 DELIMITER ;
+
 
 ------------------------------------------------------------------------------------------------------
 -- cambios 08-11-2024 Final
@@ -778,7 +791,12 @@ GROUP BY
 ORDER BY 
     promedio_calificacion DESC 
 LIMIT 5; 
-
+    DELIMITER //
+DELIMITER ;
+drop view reporteAdminEstudiantes;
+DELIMITER ;
+    DELIMITER //
+    
 CREATE VIEW reporteAdminEstudiantes AS
 SELECT 
     u.nombre,
@@ -805,7 +823,7 @@ CREATE PROCEDURE obtener_reporte_admin_estudiantes()
 BEGIN
     SELECT * FROM reporteAdminEstudiantes;
 END //
-
+    DELIMITER //
 DELIMITER ;
 
 drop procedure editar_nivel;

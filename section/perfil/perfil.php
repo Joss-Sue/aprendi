@@ -75,7 +75,7 @@ include("../../config/sessionVerif.php");
             Actualización realizada con éxito.
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="cerrarModalExito">Cerrar</button>
+            <button type="button" class="btn btn-green" id="cerrarModalExito">Cerrar</button>
         </div>
         </div>
     </div>
@@ -112,7 +112,7 @@ include("../../config/sessionVerif.php");
             Tu cuenta ha sido eliminada exitosamente. La sesión ha sido cerrada.
         </div>
         <div class="modal-footer">
-            <button type="button" class="btn btn-primary" id="cerrarModalEliminarExito">Cerrar</button>
+            <button type="button" class="btn btn-green" id="cerrarModalEliminarExito">Cerrar</button>
         </div>
         </div>
     </div>
