@@ -21,7 +21,7 @@ class ReporteClass{
             'id_categoria'=>$id_categoria,
             'estado'=>$estado]);
     
-        $reporte = $sentencia->fetch(PDO::FETCH_ASSOC);
+        $reporte = $sentencia->fetchALL(PDO::FETCH_ASSOC);
         
     
         if(!$reporte) {
@@ -31,22 +31,18 @@ class ReporteClass{
         }
     }
 
-    static function obtenerVentasPorCurso($id_curso){
-        
+    public static function obtenerVentasPorCurso($idCurso) {
         self::inicializarConexion();
-        $sql= "call sp_ventas_por_curso(:id_curso)";
-        $sentencia = self::$conexion-> prepare($sql);
-        $sentencia -> execute(['id_usuario'=>$id_curso]);
+        $sql = "CALL sp_ventas_por_curso(:curso_id_param)";
+        $sentencia = self::$conexion->prepare($sql);
+        $sentencia->bindParam(':curso_id_param', $idCurso, PDO::PARAM_INT);
     
-        $reporte = $sentencia->fetch(PDO::FETCH_ASSOC);
-        
+        $sentencia->execute();
+        $resultado = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     
-        if(!$reporte) {
-           return null;
-        }else{
-            return $reporte;
-        }
+        return $resultado ? $resultado : null;
     }
+    
 
     static function obtenerKardex($id_usuario, $id_categoria, $estado){
         
@@ -58,7 +54,7 @@ class ReporteClass{
             'id_categoria'=>$id_categoria,
             'estado'=>$estado]);
     
-        $reporte = $sentencia->fetch(PDO::FETCH_ASSOC);
+        $reporte = $sentencia->fetchALL(PDO::FETCH_ASSOC);
         
     
         if(!$reporte) {

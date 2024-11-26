@@ -40,31 +40,35 @@ class NivelClass{
 
     static function editarNivel($curso_id, $nivel, $descripcion, $url_video){
         self::inicializarConexion();
-        $niveles = NivelClass::buscarNivelByID($curso_id, $nivel);
-        $videoBinario = base64_decode(preg_replace('#^data:(\w+/[\w-]+);base64,#i', '', $url_video));
-    
-        if($niveles==null) {
-           return array(false,"error en id");
+        $nivelActual = NivelClass::buscarNivelByID($curso_id, $nivel);
+        
+        if ($nivelActual === null) {
+            return array(false, "El nivel no existe.");
         }
-        try{
-            $sqlUpdate="CALL editar_nivel(:curso_id, :nivel, :descripcion, :url_video";
-            $consultaInsert = self::$conexion-> prepare($sqlUpdate);
-
+    
+        $videoBinario = null;
+        if ($url_video && strpos($url_video, 'data:video') === 0) {
+            $videoBinario = base64_decode(preg_replace('#^data:video/\w+;base64,#i', '', $url_video));
+        } else {
+            $videoBinario = $nivelActual['url_video'];
+        }
+    
+        try {
+            $sqlUpdate = "CALL editar_nivel(:curso_id, :nivel, :descripcion, :url_video)";
+            $consultaInsert = self::$conexion->prepare($sqlUpdate);
+    
             $consultaInsert->bindValue(':curso_id', $curso_id, PDO::PARAM_INT);
             $consultaInsert->bindValue(':nivel', $nivel, PDO::PARAM_INT);
-            $consultaInsert->bindValue(':url_video', $videoBinario, PDO::PARAM_LOB);
             $consultaInsert->bindValue(':descripcion', $descripcion, PDO::PARAM_STR);
-
-            $consultaInsert -> execute();
-            return array(true,"actualizado con exito");
-        }catch(PDOException $e){
+            $consultaInsert->bindValue(':url_video', $videoBinario, PDO::PARAM_LOB);
+    
+            $consultaInsert->execute();
+            return array(true, "Nivel actualizado con éxito.");
+        } catch (PDOException $e) {
             return array(false, "Error al editar el nivel: " . $e->getMessage());
         }
-        
-
-        return array(true,"actualizado con exito");
-                                
     }
+    
 
     static function eliminarNivel($curso_id, $nivel){
         self::inicializarConexion();

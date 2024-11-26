@@ -1,108 +1,118 @@
 document.addEventListener('DOMContentLoaded', function () {
-    
-    const ventasCursosURL = `http://localhost/aprendi/api/reportesController.php?tipo=INSTRUCTOR&id=${usuarioId}&categoria=0&estado=1`;
-    const ventasPorCursoBaseURL = 'http://localhost/aprendi/api/reportesController.php?tipo=INSTRUCTOR&curso_titulo=';
+    cargarCategorias();
+    cargarCursos();
 
-    // Contenedores de las tablas
-    const tablaCursos = document.querySelector('table tbody:nth-of-type(1)');
-    const tablaAlumnos = document.querySelector('table tbody:nth-of-type(2)');
-    console.log(ventasCursosURL);
-
-    // Obtener datos de los cursos del instructor
-    fetch(ventasCursosURL)
-        .then(response => response.json())
-        .then(cursos => {
-            if (Array.isArray(cursos)) {
-                tablaCursos.innerHTML = ''; // Limpia la tabla antes de llenarla
-                let totalIngresosCursos = 0;
-
-                cursos.forEach(curso => {
-                    // Crear fila para la tabla de cursos
-                    const row = document.createElement('tr');
-
-                    // Agregar celdas con los datos
-                    const celdaNombre = document.createElement('td');
-                    celdaNombre.textContent = curso.nombre_curso;
-
-                    const celdaInscritos = document.createElement('td');
-                    celdaInscritos.textContent = curso.alumnos_inscritos;
-
-                    const celdaPromedio = document.createElement('td');
-                    celdaPromedio.textContent = `${curso.promedio_avance}%`;
-
-                    const celdaIngresos = document.createElement('td');
-                    celdaIngresos.textContent = `$${curso.total_ingresos.toFixed(2)}`;
-
-                    totalIngresosCursos += curso.total_ingresos;
-
-                    // Añadir celdas a la fila
-                    row.appendChild(celdaNombre);
-                    row.appendChild(celdaInscritos);
-                    row.appendChild(celdaPromedio);
-                    row.appendChild(celdaIngresos);
-
-                    // Añadir fila a la tabla
-                    tablaCursos.appendChild(row);
-
-                    // Obtener detalles por curso (segundo GET)
-                    obtenerVentasPorCurso(curso.nombre_curso);
-                });
-
-                // Actualizar el total de ingresos en el pie de la tabla
-                const cursosFooter = tablaCursos.closest('table').querySelector('tfoot td:last-child');
-                cursosFooter.textContent = `$${totalIngresosCursos.toFixed(2)}`;
-            } else {
-                console.error('Error: Datos de cursos no válidos.');
-            }
-        })
-        .catch(error => console.error('Error al obtener las ventas por curso:', error));
-
-    // Función para obtener los detalles de un curso
-    function obtenerVentasPorCurso(cursoTitulo) {
-        const url = `${ventasPorCursoBaseURL}${encodeURIComponent(cursoTitulo)}`;
-        fetch(url)
-            .then(response => response.json())
-            .then(alumnos => {
-                if (Array.isArray(alumnos)) {
-                    alumnos.forEach(alumno => {
-                        // Crear fila para la tabla de alumnos
-                        const row = document.createElement('tr');
-
-                        // Agregar celdas con los datos
-                        const celdaNombre = document.createElement('td');
-                        celdaNombre.textContent = alumno.nombre_alumno;
-
-                        const celdaFecha = document.createElement('td');
-                        celdaFecha.textContent = alumno.fecha_inscripcion;
-
-                        const celdaAvance = document.createElement('td');
-                        celdaAvance.textContent = `${alumno.nivel_avance}%`;
-
-                        const celdaPago = document.createElement('td');
-                        celdaPago.textContent = `$${alumno.precio_pagado.toFixed(2)}`;
-
-                        const celdaFormaPago = document.createElement('td');
-                        celdaFormaPago.textContent = alumno.forma_pago;
-
-                        // Añadir celdas a la fila
-                        row.appendChild(celdaNombre);
-                        row.appendChild(celdaFecha);
-                        row.appendChild(celdaAvance);
-                        row.appendChild(celdaPago);
-                        row.appendChild(celdaFormaPago);
-
-                        // Añadir fila a la tabla
-                        tablaAlumnos.appendChild(row);
-                    });
-
-                    // Calcular y actualizar el total en el pie de la tabla
-                    const totalIngresos = alumnos.reduce((sum, alumno) => sum + alumno.precio_pagado, 0);
-                    const alumnosFooter = tablaAlumnos.closest('table').querySelector('tfoot td:last-child');
-                    alumnosFooter.textContent = `$${totalIngresos.toFixed(2)}`;
-                } else {
-                    console.error('Error: Datos de alumnos no válidos.');
-                }
-            })
-            .catch(error => console.error('Error al obtener los detalles por alumno:', error));
-    }
+    // Eventos de filtros
+    document.getElementById('category').addEventListener('change', cargarCursos);
+    document.getElementById('activeCourses').addEventListener('change', cargarCursos);
 });
+
+function cargarCategorias() {
+    const url = 'http://localhost/aprendi/api/categoriaController.php';
+    fetch(url)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Error al cargar las categorías');
+            }
+            return response.json();
+        })
+        .then((categorias) => {
+            const selectCategoria = document.getElementById('category');
+            selectCategoria.innerHTML = '<option value="0">Todas</option>'; // Opción para todas las categorías
+            categorias.forEach((categoria) => {
+                const option = document.createElement('option');
+                option.value = categoria.id; // Cambia según el nombre del campo en tu API
+                option.textContent = categoria.nombre;
+                selectCategoria.appendChild(option);
+            });
+        })
+        .catch((error) => console.error('Error al cargar categorías:', error));
+}
+
+function cargarCursos() {
+    const idCategoria = document.getElementById('category').value || 0;
+    const estado = document.getElementById('activeCourses').checked ? 1 : 0;
+
+    const url = `http://localhost/aprendi/api/reportesController.php/?tipo=INSTRUCTOR&id=${usuarioId}&categoria=0&estado=0`;
+    fetch(url)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Error al cargar los cursos');
+            }
+            return response.json();
+        })
+        .then((cursos) => {
+            console.log(cursos);
+            const tablaCursos = document.querySelector('.table tbody');
+            tablaCursos.innerHTML = ''; // Limpiar tabla
+
+            let totalIngresos = 0;
+
+            // Verifica si cursos es un arreglo o un objeto
+            const cursosArray = Array.isArray(cursos) ? cursos : [cursos];
+
+            if (cursosArray.length === 0) {
+                tablaCursos.innerHTML = '<tr><td colspan="4">No hay cursos disponibles</td></tr>';
+                return;
+            }
+
+            cursosArray.forEach((curso) => {
+                totalIngresos += parseFloat(curso.promedio_precio_pagado || 0);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${curso.curso_titulo}</td>
+                    <td>${curso.total_estudiantes || 0}</td>
+                    <td>${curso.promedio_progreso_curso || 0}%</td>
+                    <td>$${curso.promedio_precio_pagado || 0}</td>
+                `;
+                row.addEventListener('click', () => cargarEstudiantes(curso.curso_id));
+                tablaCursos.appendChild(row);
+            });
+
+            document.querySelector('.table tfoot td:last-child').textContent = `$${totalIngresos.toFixed(2)}`;
+        })
+        .catch((error) => console.error('Error al cargar los cursos:', error));
+}
+
+
+function cargarEstudiantes(cursoId) {
+    const url = `http://localhost/aprendi/api/reportesController.php/?tipo=INSTRUCTOR&id_curso=${cursoId}`;
+    console.log(`Cargando estudiantes para curso ID: ${cursoId}`);
+
+    fetch(url)
+        .then((response) => {
+            if (!response.ok) {
+                throw new Error('Error al cargar los estudiantes');
+            }
+            return response.json();
+        })
+        .then((estudiantes) => {
+            console.log(estudiantes);
+            const tablaAlumnos = document.querySelectorAll('.table tbody')[1];
+            tablaAlumnos.innerHTML = ''; // Limpiar tabla
+
+            let totalIngresos = 0;
+            if (estudiantes.length === 0) {
+                tablaAlumnos.innerHTML = '<tr><td colspan="5">No hay alumnos inscritos en este curso</td></tr>';
+                return;
+            }
+
+            estudiantes.forEach((alumno) => {
+                totalIngresos += parseFloat(alumno.precio_pagado || 0);
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${alumno.estudiante_nombre}</td>
+                    <td>${alumno.fecha_inscripcion}</td>
+                    <td>${alumno.nivel_avance || 0}%</td>
+                    <td>$${alumno.precio_pagado || 0}</td>
+                    <td>${alumno.forma_pago || 'N/A'}</td>
+                `;
+                tablaAlumnos.appendChild(row);
+            });
+
+            document.querySelectorAll('.table tfoot td:last-child')[1].textContent = `$${totalIngresos.toFixed(2)}`;
+        })
+        .catch((error) => console.error('Error al cargar los estudiantes:', error));
+}

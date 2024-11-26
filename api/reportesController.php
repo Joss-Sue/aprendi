@@ -22,8 +22,8 @@ switch ($_SERVER['REQUEST_METHOD']) {
             } elseif (isset($_GET['tipo']) && $_GET['tipo'] == 'INSTRUCTOR') {
                 if (isset($_GET['id'], $_GET['categoria'], $_GET['estado'])) {
                     $reporte = ReporteClass::obtenerVentasCursos($_GET['id'], $_GET['categoria'], $_GET['estado']);
-                } elseif (isset($_GET['curso_titulo'])) {
-                    $reporte = ReporteClass::obtenerVentasPorCurso($_GET['curso_titulo']);
+                } elseif (isset($_GET['id_curso'])) {
+                    $reporte = ReporteClass::obtenerVentasPorCurso($_GET['id_curso']);
                 }
             }
     

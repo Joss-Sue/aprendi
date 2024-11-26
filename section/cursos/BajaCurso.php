@@ -87,26 +87,30 @@ if ($rol !== $rol_requerido) {
                         <div class="mb-3">
                             <label for="cursoTitulo" class="form-label">Título</label>
                             <input type="text" id="cursoTitulo" class="form-control" name="titulo">
+                            <small id="errorCursoTitulo" class="text-danger"></small>
                         </div>
                         <div class="mb-3">
                             <label for="cursoDescripcion" class="form-label">Descripción</label>
                             <textarea id="cursoDescripcion" class="form-control" name="descripcion"></textarea>
+                            <small id="errorCursoDescripcion" class="text-danger"></small>
                         </div>
                         <div class="mb-3">
                             <label for="cursoCosto" class="form-label">Costo</label>
                             <input type="number" id="cursoCosto" class="form-control" name="costo">
+                            <small id="errorCursoCosto" class="text-danger"></small>
                         </div>
                         <div class="mb-3">
                             <label for="cursoCategoria" class="form-label">Categoría</label>
                             <select id="cursoCategoria" class="form-select" name="categoria">
                                 <!-- Opciones cargadas dinámicamente -->
                             </select>
+                            <small id="errorCursoCategoria" class="text-danger"></small>
                         </div>
                         <div class="mb-3">
                             <label for="cursoImagen" class="form-label">Imagen</label>
                             <input type="file" id="cursoImagen" class="form-control" name="imagen">
                         </div>
-                        <button type="button" class="btn btn-primary mt-2 w-100" onclick="guardarEdicionCurso()">Guardar Cambios del Curso</button>
+                        <button type="button" id="btnGuardarCurso" class="btn btn-green mt-2 w-100" onclick="guardarEdicionCurso()">Guardar Cambios del Curso</button>
                     </form>
                 </div>
 
@@ -114,7 +118,6 @@ if ($rol !== $rol_requerido) {
                 <div class="w-50 ps-3">
                     <h5>Niveles del Curso</h5>
                     <div id="nivelesContainer"></div>
-                    <button type="button" class="btn btn-primary mt-3 w-100" onclick="guardarEdicionNiveles()">Guardar Cambios de Niveles</button>
                 </div>
             </div>
         </div>
@@ -130,6 +133,40 @@ if ($rol !== $rol_requerido) {
             </div>
             <div class="modal-body">
                 <video controls style="width: 100%; height: auto;"></video>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="successModalLabel">Éxito</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p id="successModalMessage">Operación realizada con éxito.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-green" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="confirmarBajaModal" tabindex="-1" aria-labelledby="confirmarBajaLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="confirmarBajaLabel">Confirmar Baja</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas dar de baja este curso? Esta acción no se puede deshacer.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="btnConfirmarBaja">Dar de Baja</button>
             </div>
         </div>
     </div>

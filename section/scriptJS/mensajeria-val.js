@@ -203,6 +203,7 @@ async function enviarMensaje(remitenteId) {
     }
 
     const url = 'http://localhost/aprendi/api/mensajesController.php';
+    try {
     const response = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -213,12 +214,18 @@ async function enviarMensaje(remitenteId) {
             contenido: mensajeText
         })
     });
+        if (!response.ok) {
+            const errorText = await response.text();
+            console.error("Error del servidor:", errorText);
+            throw new Error('Error al enviar mensaje');
+        }
 
-    if (response.ok) {
+        const jsonResponse = await response.json();
+        console.log(jsonResponse);
         cargarMensajes(cursoSeleccionado, remitenteId);
         document.getElementById('mensaje').value = '';
-    } else {
-        console.error('Error al enviar mensaje');
+    } catch (error) {
+        console.error("Error al procesar el mensaje:", error);
     }
 }
 // Obtener el ID del instructor de un curso dado
