@@ -20,7 +20,6 @@ if (isset($usuarioDatos['status']) && $usuarioDatos['status'] === 'error') {
     $correo = $usuarioDatos['correo'];
     $rol = $usuarioDatos['rol'];
 }
-error_log("Este es un mensaje de prueba para confirmar los logs.");
 
 ?>
 <!DOCTYPE html>
@@ -203,9 +202,9 @@ error_log("Este es un mensaje de prueba para confirmar los logs.");
 
 
         <div class="comprar-curso mt-4">
-            <h4>Comprar Curso Completo</h4>
+            <h4 id="comprarhbtn" class="comprarhbtn">Comprar Curso Completo</h4>
             <?php if ($rol == 'estudiante'): ?>
-            <a class="btn btn-green btnCompra">Comprar</a>
+            <a class="btn btn-green comprarButton" id="comprarButton" >Comprar</a>
             <?php endif; ?>
         </div>
 
@@ -241,10 +240,10 @@ error_log("Este es un mensaje de prueba para confirmar los logs.");
                 const estudianteId = <?php echo json_encode($usuario_id); ?>;
                 const usuarioRol = <?php echo json_encode($rol); ?>; // "instructor" o "estudiante"
     </script>
-    <!-- <script src="../scriptJS/valoracionCurso-val.js"></script> -->
+    <script src="../scriptJS/valoracionCurso-val.js"></script>
     <script src="../scriptJS/detallesCurso-val.js"></script>
     <script src="../scriptJS/inscribirCurso-val.js"></script>
-    <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             fetch('../partials/menu.php')

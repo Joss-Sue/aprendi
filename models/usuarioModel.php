@@ -87,36 +87,42 @@ class UsuarioClass{
     }
 }
 
-    static function editarUsuario($id, $correo, $contrasena, $nombre, $imagen){
+    static function editarUsuario($id, $correo, $contrasena, $nombre, $imagen) {
         self::inicializarConexion();
         $usuario = UsuarioClass::buscarUsuarioByID($id);
         
-        if($usuario==null) {
-           return array(false,"error en id");
+        if ($usuario == null) {
+            return array(false, "error en id");
         }
 
-        $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
-
-
-        try{
-        $sqlUpdate="call editar_usuario(:correo, :contrasena, :nombre, :id, foto)";
-        $sentencia = self::$conexion-> prepare($sqlUpdate);
-
-        $sentencia->bindValue(':correo', $correo, PDO::PARAM_STR);
-        $sentencia->bindValue(':contrasena', $contrasena, PDO::PARAM_STR);
-        $sentencia->bindValue(':nombre', $nombre, PDO::PARAM_STR);
-        $sentencia->bindValue(':id', $id, PDO::PARAM_INT);
-        $sentencia->bindValue(':foto', $imagenBinario, PDO::PARAM_LOB);
-
-
-        $sentencia -> execute();
-
-        return array(true,"actualizado con exito");
-        }catch(PDOException $e){
-        return array(false, "Error al actualizar usuario: " . $e->getMessage());
+        // Verificar si se pasó una nueva imagen o no
+        $imagenBinario = null;
+        if (!empty($imagen)) {
+            // Procesar solo si hay una nueva imagen
+            $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
+        } else {
+            // Usar la imagen actual del usuario
+            $imagenBinario = $usuario['imagen'];
         }
-                                
+
+        try {
+            $sqlUpdate = "CALL editar_usuario(:correo, :contrasena, :nombre, :id, :foto)";
+            $sentencia = self::$conexion->prepare($sqlUpdate);
+
+            $sentencia->bindValue(':correo', $correo, PDO::PARAM_STR);
+            $sentencia->bindValue(':contrasena', $contrasena, PDO::PARAM_STR);
+            $sentencia->bindValue(':nombre', $nombre, PDO::PARAM_STR);
+            $sentencia->bindValue(':id', $id, PDO::PARAM_INT);
+            $sentencia->bindValue(':foto', $imagenBinario, PDO::PARAM_LOB);
+
+            $sentencia->execute();
+
+            return array(true, "actualizado con éxito");
+        } catch (PDOException $e) {
+            return array(false, "Error al actualizar usuario: " . $e->getMessage());
+        }
     }
+
 
     static function eliminarUsuario($id){
         self::inicializarConexion();

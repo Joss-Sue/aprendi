@@ -21,6 +21,7 @@ if (isset($_SESSION['usuario_id'])) {
     } else {
         $correo = $usuarioDatos['correo'];
         $rol = $usuarioDatos['rol'];
+        $foto = $usuarioDatos['foto'] ?? '../img/img-default.png';
     }
 } else {
     // Si no hay sesión, establecer valores predeterminados
@@ -60,7 +61,7 @@ if (isset($_SESSION['usuario_id'])) {
             <?php endif; ?>
 
                 <li class="nav-item dropdown">
-                <?php if ($rol == 'estudiante'|| $rol == 'instructor'||$rol == 'administrador' ): ?>
+                <?php if ($rol == 'estudiante'|| $rol == 'instructor' ||$rol == 'administrador' ): ?>
                     <a class="nav-link dropdown-toggle" href="#" id="cursosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="bi bi-book"></i>Cursos
                     </a>
@@ -70,7 +71,7 @@ if (isset($_SESSION['usuario_id'])) {
                         <li><a class="dropdown-item" href="../cursos/RegistroCurso.php">Registrar Curso</a></li>
                         <?php endif; ?>
                         <?php if ($rol == 'instructor'): ?>
-                        <li><a class="dropdown-item" href="../cursos/BajaCurso.php">Dar de Baja Curso</a></li>
+                        <li><a class="dropdown-item" href="../cursos/BajaCurso.php">Editar Curso</a></li>
                         <?php endif; ?>
                         <?php if ($rol == 'estudiante'): ?>
                         <li><a class="dropdown-item" href="../cursos/mis-cursos.php">Mis Cursos</a></li>
@@ -109,6 +110,15 @@ if (isset($_SESSION['usuario_id'])) {
                 <li class="nav-item">
                     <a class="nav-link" href="../../config/cerrarSesion.php"><i class="bi bi-box-arrow-right"></i> Cerrar sesión</a>
                 </li>
+                    <!-- Aquí se agrega el rectángulo con la imagen y el rol -->
+                    <li class="nav-item d-flex align-items-center">
+                        <a class="dropdown-item" href="../perfil/perfil.php">
+                        <div class="user-info d-flex align-items-center me-3">
+                            <img src="<?php echo $foto; ?>" alt="Avatar" class="img-thumbnail rounded-circle" style="width: 40px; height: 40px; object-fit: cover; margin-right: 10px;">
+                            <span class="text-muted"><?php echo ucfirst($rol); ?></span>
+                        </div>
+                        </a>
+                    </li>
             <?php endif; ?>
             </ul>
         </div>

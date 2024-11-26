@@ -40,37 +40,43 @@ class CursoClass{
         }
     }
 
-    static function editarCurso($id, $titulo, $descripcion, $costo, $categoria, $imagen){
+    static function editarCurso($id, $titulo, $descripcion, $costo, $categoria, $imagen = null) {
         self::inicializarConexion();
-       
+        
         $curso = CursoClass::buscarCursoByID($id);
         
+        if ($curso == null) {
+            return array(false, "Error: Curso no encontrado.");
+        }
     
-        if($curso==null) {
-           return array(false,"error en id");
+        // Procesar la imagen solo si está presente
+        $imagenBinario = null;
+        if ($imagen && !empty($imagen)) {
+            $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
+        } else {
+            // Usa la imagen actual si no se proporciona una nueva
+            $imagenBinario = $curso['imagen'];
         }
+    
+        try {
 
-        $imagenBinario = base64_decode(preg_replace('#^data:image/\w+;base64,#i', '', $imagen));
-
-        try{
-            $sqlUpdate="CALL editar_curso (:id, :titulo, :descripcion, :costo, :categoria, :imagen;";
-            $sentencia = self::$conexion-> prepare($sqlUpdate);
-            $sentencia->bindValue('id', $id, PDO::PARAM_INT);
-            $sentencia->bindValue('titulo', $titulo, PDO::PARAM_STR);
-            $sentencia->bindValue('descripcion', $descripcion, PDO::PARAM_STR);
-            $sentencia->bindValue('costo', $costo, PDO::PARAM_STR);
-            $sentencia->bindValue('categoria', $categoria, PDO::PARAM_INT);
-            $sentencia->bindValue('imagen', $imagenBinario, PDO::PARAM_LOB);
-
-            $sentencia -> execute();
-            return array(true,"actualizado con exito");
-        }catch(PDOException $e){
-            return array(false, "Error al editar categoria: " . $e->getMessage());
+            $sqlUpdate = "CALL editar_curso(:id, :titulo, :descripcion, :costo, :categoria, :imagen)";
+            $sentencia = self::$conexion->prepare($sqlUpdate);
+    
+            $sentencia->bindValue(':id', $id, PDO::PARAM_INT);
+            $sentencia->bindValue(':titulo', $titulo, PDO::PARAM_STR);
+            $sentencia->bindValue(':descripcion', $descripcion, PDO::PARAM_STR);
+            $sentencia->bindValue(':costo', $costo, PDO::PARAM_STR);
+            $sentencia->bindValue(':categoria', $categoria, PDO::PARAM_INT);
+            $sentencia->bindValue(':imagen', $imagenBinario, PDO::PARAM_LOB);
+    
+            $sentencia->execute();
+            return array(true, "Curso actualizado con éxito.");
+        } catch (PDOException $e) {
+            return array(false, "Error al editar curso: " . $e->getMessage());
         }
-                                
     }
-
-   
+    
 
     static function eliminarCurso($id){
         self::inicializarConexion();
@@ -193,29 +199,30 @@ class CursoClass{
         }
     }
 
-    static function buscarAllProductosWithID($pagina,$id){
+    static function buscarAllProductosWithID($pagina, $id) {
         $pagina = ($pagina - 1) * 20;
         self::inicializarConexion();
-        //$tipo="vendedor";
-        
-        $sql="CALL buscar_cursos_instructor( :id, :pagina)";
-        
-        $sentencia = self::$conexion-> prepare($sql);
-        $sentencia->bindValue(':pagina', $pagina, PDO::PARAM_INT,);
-        $sentencia->bindValue(':id',$id, PDO::PARAM_INT);
-        $sentencia -> execute();
-        
-        //$sentencia->execute();
-        
+    
+        $sql = "CALL buscar_cursos_instructor(:id, :pagina)";
+        $sentencia = self::$conexion->prepare($sql);
+        $sentencia->bindValue(':pagina', $pagina, PDO::PARAM_INT);
+        $sentencia->bindValue(':id', $id, PDO::PARAM_INT);
+        $sentencia->execute();
     
         $productos = $sentencia->fetchAll(PDO::FETCH_ASSOC);
     
-        if(!$productos) {
-           return null;
-        }else{
-            return $productos;
+        // Convertir imágenes a base64 si existen
+        if ($productos) {
+            foreach ($productos as &$producto) {
+                if (isset($producto['imagen'])) {
+                    $producto['imagen'] = 'data:image/png;base64,' . base64_encode($producto['imagen']);
+                }
+            }
         }
+    
+        return $productos ? $productos : null;
     }
+    
 
     static function buscarCursos($valorBusqueda, $categoria_id, $instructor_id,$fecha_inicio, $fecha_fin){
         self::inicializarConexion();
