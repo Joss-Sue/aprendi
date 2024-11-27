@@ -659,7 +659,7 @@ JOIN Cursos Cu ON Co.curso_id = Cu.id
 JOIN Usuarios U ON Co.usuario_id = U.id
 WHERE Co.estado = 1;
 
-CREATE VIEW vista_cursos_por_categoria AS -- Proporciona una lista de cursos organizados por categoría y muestrao información del instructor.
+CREATE VIEW vista_cursos_por_categoria AS 
 SELECT 
     Ca.nombre AS nombre_categoria,
     Cu.id AS curso_id,

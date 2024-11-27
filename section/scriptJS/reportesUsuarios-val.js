@@ -16,27 +16,27 @@ function cargarReporteUsuarios() {
             'Content-Type': 'application/json',
         },
     })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error("Error al obtener los usuarios");
-        }
-        return response.json();
-    })
-    .then(data => {
-        console.log(data);
-        if (tipoReporte === 'INSTRUCTOR') {
-            document.getElementById('reporteInstructores').style.display = 'block';
-            document.getElementById('reporteEstudiantes').style.display = 'none';
-            llenarTablaInstructores(data);
-        } else if (tipoReporte === 'ESTUDIANTE') {
-            document.getElementById('reporteInstructores').style.display = 'none';
-            document.getElementById('reporteEstudiantes').style.display = 'block';
-            llenarTablaEstudiantes(data);
-        }
-    })
-    .catch(error => {
-        console.error('Error al cargar los usuarios:', error);
-    });
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Error al obtener los usuarios");
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log(data);
+            if (tipoReporte === 'INSTRUCTOR') {
+                document.getElementById('reporteInstructores').style.display = 'block';
+                document.getElementById('reporteEstudiantes').style.display = 'none';
+                llenarTablaInstructores(data);
+            } else if (tipoReporte === 'ESTUDIANTE') {
+                document.getElementById('reporteInstructores').style.display = 'none';
+                document.getElementById('reporteEstudiantes').style.display = 'block';
+                llenarTablaEstudiantes(data);
+            }
+        })
+        .catch(error => {
+            console.error('Error al cargar los usuarios:', error);
+        });
 }
 
 function llenarTablaInstructores(instructores) {
@@ -60,6 +60,7 @@ function llenarTablaEstudiantes(estudiantes) {
     const tablaEstudiantes = document.getElementById('tablaEstudiantes');
     tablaEstudiantes.innerHTML = '';
 
+    console.log(estudiantes);
     estudiantes.forEach(estudiante => {
         const fila = document.createElement('tr');
         fila.innerHTML = `
